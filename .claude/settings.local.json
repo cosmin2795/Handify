@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /Users/ancaroman/AndroidStudioProjects/Handify/composeApp/src/androidMain/kotlin/com/example/handify/*.kt /Users/ancaroman/AndroidStudioProjects/Handify/shared/src/commonMain/kotlin/com/example/handify/*.kt /Users/ancaroman/AndroidStudioProjects/Handify/server/src/main/kotlin/com/example/handify/*.kt)",
+      "Bash(./gradlew tasks --group=\"verification\")"
+    ]
+  }
+}
