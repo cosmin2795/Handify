@@ -15,12 +15,6 @@ class AuthRepositoryImpl(
         return User(id = response.userId, email = response.email, name = response.name)
     }
 
-    override suspend fun loginWithFacebook(accessToken: String): User {
-        val response = authApi.loginWithFacebook(accessToken)
-        tokenStorage.saveToken(response.token)
-        return User(id = response.userId, email = response.email, name = response.name)
-    }
-
     override fun saveAuthToken(token: String) = tokenStorage.saveToken(token)
 
     override fun getAuthToken(): String? = tokenStorage.getToken()

@@ -1,6 +1,4 @@
 package com.example.handify.ui.screen
-
-import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -22,18 +21,10 @@ import com.example.handify.R
 import com.example.handify.presentation.auth.LoginViewModel
 import com.example.handify.ui.theme.SocialButtonBackground
 import com.example.handify.ui.theme.SocialButtonBorder
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
-import com.facebook.login.LoginManager
-import com.facebook.login.LoginResult
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
-
-// Set to true once you have created a Facebook Developer App and filled in strings.xml
-private const val FACEBOOK_ENABLED = false
 
 @Composable
 fun LoginScreen(
@@ -43,28 +34,8 @@ fun LoginScreen(
     val state = viewModel.state
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val googleWebClientId = stringResource(R.string.google_web_client_id)
 
-    // Facebook callback — only registered when Facebook is enabled
-    val callbackManager = remember { CallbackManager.Factory.create() }
-    if (FACEBOOK_ENABLED) {
-        DisposableEffect(callbackManager) {
-            LoginManager.getInstance().registerCallback(
-                callbackManager,
-                object : FacebookCallback<LoginResult> {
-                    override fun onSuccess(result: LoginResult) {
-                        viewModel.loginWithFacebook(result.accessToken.token)
-                    }
-                    override fun onCancel() {}
-                    override fun onError(error: FacebookException) {
-                        viewModel.onError(error.message ?: "Facebook login failed")
-                    }
-                }
-            )
-            onDispose { LoginManager.getInstance().unregisterCallback(callbackManager) }
-        }
-    }
-
-    // Navigate on successful login
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) onLoginSuccess()
     }
@@ -99,13 +70,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(56.dp))
 
-            // ── Google button ─────────────────────────────────────────────
             SocialLoginButton(
                 onClick = {
                     scope.launch {
                         signInWithGoogle(
                             context = context,
-                            webClientId = context.getString(R.string.google_web_client_id),
+                            webClientId = googleWebClientId,
                             onSuccess = { idToken -> viewModel.loginWithGoogle(idToken) },
                             onError = { viewModel.onError(it) }
                         )
@@ -115,32 +85,11 @@ fun LoginScreen(
                 iconRes = R.drawable.ic_google,
                 text = "Log in with Google"
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // ── Facebook button ───────────────────────────────────────────
-            SocialLoginButton(
-                onClick = {
-                    if (FACEBOOK_ENABLED) {
-                        LoginManager.getInstance().logIn(
-                            context as Activity,
-                            callbackManager,
-                            listOf("email", "public_profile")
-                        )
-                    }
-                },
-                enabled = FACEBOOK_ENABLED && !state.isLoading,
-                iconRes = R.drawable.ic_facebook,
-                text = if (FACEBOOK_ENABLED) "Log in with Facebook" else "Log in with Facebook  (coming soon)"
-            )
-
-            // ── Loading indicator ─────────────────────────────────────────
             if (state.isLoading) {
                 Spacer(modifier = Modifier.height(24.dp))
                 CircularProgressIndicator(modifier = Modifier.size(32.dp))
             }
 
-            // ── Error message ─────────────────────────────────────────────
             state.error?.let { error ->
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(

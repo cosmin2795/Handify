@@ -2,6 +2,7 @@ package com.example.handify.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class AndroidTokenStorage(context: Context) : TokenStorage {
 
@@ -9,13 +10,13 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
         context.getSharedPreferences("handify_prefs", Context.MODE_PRIVATE)
 
     override fun saveToken(token: String) {
-        prefs.edit().putString(KEY_TOKEN, token).apply()
+        prefs.edit { putString(KEY_TOKEN, token) }
     }
 
     override fun getToken(): String? = prefs.getString(KEY_TOKEN, null)
 
     override fun clearToken() {
-        prefs.edit().remove(KEY_TOKEN).apply()
+        prefs.edit { remove(KEY_TOKEN) }
     }
 
     companion object {

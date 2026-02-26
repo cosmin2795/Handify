@@ -9,8 +9,8 @@ object DatabaseFactory {
     fun init() {
         // TODO: Move credentials to environment variables or application.conf
         val url = System.getenv("DB_URL") ?: "jdbc:postgresql://localhost:5432/handify"
-        val user = System.getenv("DB_USER") ?: "postgres"
-        val password = System.getenv("DB_PASSWORD") ?: "postgres"
+        val user = System.getenv("DB_USER") ?: System.getProperty("user.name")
+        val password = System.getenv("DB_PASSWORD") ?: ""
 
         Database.connect(
             url = url,

@@ -27,18 +27,6 @@ class LoginViewModel(
         }
     }
 
-    fun loginWithFacebook(accessToken: String) {
-        viewModelScope.launch {
-            state = state.copy(isLoading = true, error = null)
-            try {
-                val user = authRepository.loginWithFacebook(accessToken)
-                state = state.copy(isLoading = false, user = user, isLoggedIn = true)
-            } catch (e: Exception) {
-                state = state.copy(isLoading = false, error = e.message ?: "Facebook login failed")
-            }
-        }
-    }
-
     fun onError(message: String) {
         state = state.copy(isLoading = false, error = message)
     }

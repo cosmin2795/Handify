@@ -3,13 +3,4 @@
 
     <!-- Google Sign-In: Web Client ID from Google Cloud Console -->
     <string name="google_web_client_id">1073015842574-j1b8al0e91g3engmg9rtchtlnqemtut7.apps.googleusercontent.com</string>
-
-    <!--
-        Facebook Login: requires a Facebook Developer App.
-        Go to https://developers.facebook.com → Create App → Android
-        Then replace the values below.
-    -->
-    <string name="facebook_app_id">000000000000000</string>
-    <string name="facebook_client_token">placeholder</string>
-    <string name="fb_login_protocol_scheme">fb000000000000000</string>
 </resources>

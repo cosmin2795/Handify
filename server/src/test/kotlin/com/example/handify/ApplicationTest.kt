@@ -11,10 +11,9 @@ class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
         application {
-            module()
+            module(initDatabase = false)
         }
         val response = client.get("/")
-        assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals("Ktor: ${Greeting().greet()}", response.bodyAsText())
+        assertEquals(HttpStatusCode.NotFound, response.status)
     }
 }

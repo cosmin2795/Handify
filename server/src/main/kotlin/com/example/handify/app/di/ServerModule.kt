@@ -1,7 +1,6 @@
 package com.example.handify.app.di
 
 import com.example.handify.features.auth.data.UserRepositoryImpl
-import com.example.handify.features.auth.domain.LoginWithFacebookUseCase
 import com.example.handify.features.auth.domain.LoginWithGoogleUseCase
 import com.example.handify.features.auth.domain.UserRepository
 import io.ktor.client.*
@@ -12,7 +11,7 @@ import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 val serverModule = module {
-    // HTTP Client for calling external APIs (Google, Facebook)
+    // HTTP Client for calling external APIs (Google)
     single<HttpClient> {
         HttpClient(CIO) {
             install(ContentNegotiation) {
@@ -24,5 +23,4 @@ val serverModule = module {
     // Auth
     single<UserRepository> { UserRepositoryImpl() }
     single { LoginWithGoogleUseCase(get(), get()) }
-    single { LoginWithFacebookUseCase(get(), get()) }
 }

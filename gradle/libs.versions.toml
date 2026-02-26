@@ -12,7 +12,6 @@ androidx-testExt = "1.3.0"
 composeMultiplatform = "1.10.0"
 credentials = "1.2.2"
 exposed = "0.55.0"
-facebook-login = "17.0.0"
 google-identity = "1.1.1"
 java-jwt = "4.4.0"
 junit = "4.13.2"
@@ -101,9 +100,6 @@ java-jwt = { module = "com.auth0:java-jwt", version.ref = "java-jwt" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "google-identity" }
-
-# Facebook Login (Android)
-facebook-login = { module = "com.facebook.android:facebook-login", version.ref = "facebook-login" }
 
 # Navigation
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }

@@ -13,5 +13,4 @@ val HandifyOnSurface = Color(0xFF1A1A1A)
 
 val SocialButtonBackground = Color(0xFFF5F5F5)
 val SocialButtonBorder = Color(0xFFE0E0E0)
-val FacebookBlue = Color(0xFF1877F2)
 val TextSecondary = Color(0xFF757575)

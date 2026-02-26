@@ -31,8 +31,6 @@ kotlin {
             implementation(libs.credentials.play.services)
             implementation(libs.google.identity)
 
-            // Facebook Login
-            implementation(libs.facebook.login)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

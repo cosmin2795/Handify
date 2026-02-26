@@ -10,5 +10,5 @@ data class User(
 )
 
 enum class AuthProvider {
-    GOOGLE, FACEBOOK
+    GOOGLE
 }
