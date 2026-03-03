@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Ktor Server",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "JAVA_HOME=/Users/ancaroman/.sdkman/candidates/java/current ./gradlew :server:run"],
+      "port": 8080
+    }
+  ]
+}

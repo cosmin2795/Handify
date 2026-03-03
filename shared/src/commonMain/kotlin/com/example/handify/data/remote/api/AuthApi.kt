@@ -12,9 +12,14 @@ private data class GoogleAuthRequest(val idToken: String)
 
 class AuthApi(private val client: HttpClient, private val baseUrl: String) {
 
-    suspend fun loginWithGoogle(idToken: String): AuthResponse =
-        client.post("$baseUrl/api/auth/google") {
+    suspend fun loginWithGoogle(idToken: String): AuthResponse {
+        val response = client.post("$baseUrl/api/auth/google") {
             contentType(ContentType.Application.Json)
             setBody(GoogleAuthRequest(idToken))
-        }.body()
+        }
+        if (!response.status.isSuccess()) {
+            throw Exception("Google auth failed: ${response.status.value}")
+        }
+        return response.body()
+    }
 }
