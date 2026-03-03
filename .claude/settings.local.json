@@ -2,7 +2,36 @@
   "permissions": {
     "allow": [
       "Bash(wc -l /Users/ancaroman/AndroidStudioProjects/Handify/composeApp/src/androidMain/kotlin/com/example/handify/*.kt /Users/ancaroman/AndroidStudioProjects/Handify/shared/src/commonMain/kotlin/com/example/handify/*.kt /Users/ancaroman/AndroidStudioProjects/Handify/server/src/main/kotlin/com/example/handify/*.kt)",
-      "Bash(./gradlew tasks --group=\"verification\")"
+      "Bash(./gradlew tasks --group=\"verification\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current ./gradlew :server:dependencies --configuration runtimeClasspath)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current jar tf /Users/ancaroman/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-core-jvm/3.3.3/3a64dea910bb693b87568119de8f0cc3469251c7/ktor-server-core-jvm-3.3.3.jar)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current jar tf ~/.gradle/caches/modules-2/files-2.1/io.insert-koin/koin-ktor/4.0.0/*/koin-ktor-4.0.0.jar)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current jar tf ~/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-core-jvm/3.0.1/4f3572a6c932e23f4ce4209b4e846137c5c71f53/ktor-server-core-jvm-3.0.1.jar)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current ./gradlew :server:clean)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current ./gradlew :server:clean --no-build-cache)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current ./gradlew :server:compileKotlin --no-build-cache)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current javap -verbose /Users/ancaroman/AndroidStudioProjects/Handify/server/build/classes/kotlin/main/com/example/handify/features/auth/api/AuthRoutesKt.class)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current javap -verbose /Users/ancaroman/AndroidStudioProjects/Handify/server/build/classes/kotlin/main/com/example/handify/features/auth/api/AuthRoutesKt$authRoutes$1$1.class)",
+      "Bash(lsof -ti:8080)",
+      "Bash(xargs kill -9)",
+      "Bash(while read jar)",
+      "Bash(do if JAVA_HOME=~/.sdkman/candidates/java/current jar tf \"$jar\")",
+      "Bash(then)",
+      "Bash(echo \"FOUND in: $jar\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(JAVA_HOME=~/.sdkman/candidates/java/current jar tf /Users/ancaroman/.gradle/caches/modules-2/files-2.1/io.ktor/ktor-server-websockets-jvm/3.3.3/5726cb949385d22837e02b144de4901992b58f28/ktor-server-websockets-jvm-3.3.3.jar)",
+      "Bash(xargs -I{} sh -c 'JAVA_HOME=~/.sdkman/candidates/java/current javap -classpath {} -c org.koin.ktor.ext.RouteExtKt 2>/dev/null')",
+      "Bash(xargs cat)",
+      "WebFetch(domain:mvnrepository.com)",
+      "WebFetch(domain:search.maven.org)",
+      "WebFetch(domain:central.sonatype.com)",
+      "Bash(git add gradle/libs.versions.toml shared/src/commonMain/kotlin/com/example/handify/data/remote/api/AuthApi.kt server/src/main/kotlin/com/example/handify/features/auth/api/AuthRoutes.kt shared/build.gradle.kts shared/src/commonMain/kotlin/com/example/handify/core/di/SharedModule.kt composeApp/src/androidMain/kotlin/com/example/handify/di/AppModule.kt shared/src/commonMain/kotlin/com/example/handify/core/network/HttpClientFactory.kt .claude/launch.json .claude/settings.json)",
+      "Bash(git add gradle/libs.versions.toml shared/src/commonMain/kotlin/com/example/handify/data/remote/api/AuthApi.kt server/src/main/kotlin/com/example/handify/features/auth/api/AuthRoutes.kt shared/build.gradle.kts shared/src/commonMain/kotlin/com/example/handify/core/di/SharedModule.kt composeApp/src/androidMain/kotlin/com/example/handify/di/AppModule.kt .claude/launch.json .claude/settings.json)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git add .claude/settings.local.json)"
     ]
   }
 }
