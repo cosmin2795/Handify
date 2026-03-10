@@ -1,9 +1,6 @@
 package com.example.handify.core.di
 
 import com.example.handify.data.remote.api.AuthApi
-import com.example.handify.data.repository.AuthRepositoryImpl
-import com.example.handify.domain.repository.AuthRepository
-import com.example.handify.presentation.auth.LoginViewModel
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -11,10 +8,9 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
-const val BASE_URL = "http://10.0.2.2:8080" // Android emulator → localhost
+const val BASE_URL = "http://10.0.2.2:8080"
 
 val sharedModule = module {
     single<HttpClient> {
@@ -36,10 +32,5 @@ val sharedModule = module {
         }
     }
 
-    // Auth
     single { AuthApi(get(), BASE_URL) }
-    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
-
-    // ViewModels
-    viewModel { LoginViewModel(get()) }
 }

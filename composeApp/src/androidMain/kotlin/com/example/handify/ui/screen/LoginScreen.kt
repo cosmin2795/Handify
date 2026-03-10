@@ -1,4 +1,5 @@
 package com.example.handify.ui.screen
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,23 +8,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
 import com.example.handify.R
 import com.example.handify.presentation.auth.LoginViewModel
 import com.example.handify.ui.theme.SocialButtonBackground
 import com.example.handify.ui.theme.SocialButtonBorder
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -32,9 +25,6 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel()
 ) {
     val state = viewModel.state
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val googleWebClientId = stringResource(R.string.google_web_client_id)
 
     LaunchedEffect(state.isLoggedIn) {
         if (state.isLoggedIn) onLoginSuccess()
@@ -51,7 +41,6 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // App name
             Text(
                 text = "Handify",
                 fontSize = 42.sp,
@@ -71,20 +60,12 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(56.dp))
 
             SocialLoginButton(
-                onClick = {
-                    scope.launch {
-                        signInWithGoogle(
-                            context = context,
-                            webClientId = googleWebClientId,
-                            onSuccess = { idToken -> viewModel.loginWithGoogle(idToken) },
-                            onError = { viewModel.onError(it) }
-                        )
-                    }
-                },
+                onClick = { viewModel.loginWithGoogle() },
                 enabled = !state.isLoading,
                 iconRes = R.drawable.ic_google,
                 text = "Log in with Google"
             )
+
             if (state.isLoading) {
                 Spacer(modifier = Modifier.height(24.dp))
                 CircularProgressIndicator(modifier = Modifier.size(32.dp))
@@ -150,35 +131,5 @@ private fun SocialLoginButton(
                 fontWeight = FontWeight.Medium
             )
         }
-    }
-}
-
-private suspend fun signInWithGoogle(
-    context: android.content.Context,
-    webClientId: String,
-    onSuccess: (String) -> Unit,
-    onError: (String) -> Unit
-) {
-    val credentialManager = CredentialManager.create(context)
-    val googleIdOption = GetGoogleIdOption.Builder()
-        .setServerClientId(webClientId)
-        .setFilterByAuthorizedAccounts(false)
-        .setAutoSelectEnabled(false)
-        .build()
-    val request = GetCredentialRequest.Builder()
-        .addCredentialOption(googleIdOption)
-        .build()
-
-    try {
-        val result = credentialManager.getCredential(context = context, request = request)
-        val credential = result.credential
-        if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            val googleCredential = GoogleIdTokenCredential.createFrom(credential.data)
-            onSuccess(googleCredential.idToken)
-        } else {
-            onError("Unexpected credential type")
-        }
-    } catch (e: GetCredentialException) {
-        onError(e.errorMessage?.toString() ?: "Google sign-in failed")
     }
 }

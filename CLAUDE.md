@@ -26,8 +26,8 @@ Handify is a **Kotlin Multiplatform (KMP)** marketplace platform where clients p
 |---------|---------|
 | Ktor Client 3.3.3 | HTTP calls to server |
 | kotlinx.serialization | JSON parsing |
-| Koin 4.0.0 | Dependency Injection |
-| androidx.lifecycle ViewModel | ViewModels in commonMain |
+| Koin 4.1.0 | Dependency Injection |
+| androidx.lifecycle ViewModel | ViewModels (shared or platform-specific) |
 | kotlinx.coroutines | async/await |
 
 ### composeApp (Android)
@@ -84,12 +84,14 @@ This project follows **Clean Architecture**. Every feature must respect the laye
 - Contains Response models (API responses) annotated with `@Serializable`
 - Contains mappers that convert Response models to domain models
 - Knows about Ktor Client, but domain does not know about data
+- **Exception**: if a repository implementation requires platform-specific APIs (e.g. Android `SharedPreferences`), it lives in `composeApp/androidMain/data/` instead
 
 **Presentation layer** (`shared/commonMain/presentation/`)
-- Contains ViewModels that hold and manage UI state
+- Contains ViewModels that hold and manage UI state — **always in shared, never in platform modules**
 - Calls Use Cases when real logic exists, otherwise calls repositories directly
 - Exposes immutable state to the UI
 - Never imports Compose or SwiftUI — it is platform-agnostic
+- When a ViewModel needs a platform capability (e.g. Google sign-in), define an interface in `shared/commonMain/domain/source/` and inject it — the ViewModel never depends directly on Android classes
 
 **UI** (`composeApp/androidMain/` and `iosApp/`)
 - Observes state from ViewModels
@@ -169,21 +171,18 @@ User action
     ↓
 Screen (Composable / SwiftUI View)
     ↓ calls function
-ViewModel (shared/presentation)
+ViewModel (shared/presentation — always)
     ↓ calls
-Use Case (shared/domain)
+Use Case (shared/domain) [only if real logic exists]
     ↓ calls interface
-Repository Interface (shared/domain)
+Repository Interface / Source Interface (shared/domain)
     ↑ implemented by
-Repository Impl (shared/data)
-    ↓ HTTP request
-Ktor Client → Server
+Repository Impl (shared/data  OR  composeApp/androidMain/data if platform APIs needed)
+Platform Source Impl (composeApp/androidMain/data/source — e.g. AndroidGoogleAuthSource)
+    ↓ HTTP request / platform call
+Ktor Client → Server  /  Android SDK
     ↓
-Ktor Route (server/routing)
-    ↓
-Server Repository (server/data)
-    ↓
-Exposed + PostgreSQL
+Ktor Route → Server Repository → Exposed + PostgreSQL
 ```
 
 ---
@@ -194,13 +193,8 @@ Exposed + PostgreSQL
 ```
 shared/commonMain/kotlin/com/example/handify/
 ├── core/
-│   ├── di/
-│   │   ├── SharedModule.kt
-│   │   └── NetworkModule.kt
-│   ├── network/
-│   │   └── HttpClientFactory.kt
-│   └── util/
-│       └── Result.kt
+│   └── di/
+│       └── SharedModule.kt          ← HttpClient + platform-agnostic API singletons
 ├── domain/
 │   ├── model/
 │   │   ├── Job.kt
@@ -219,20 +213,26 @@ shared/commonMain/kotlin/com/example/handify/
 │           ├── PlaceBidUseCase.kt
 │           └── AcceptBidUseCase.kt
 ├── data/
-│   ├── remote/
-│   │   ├── api/
-│   │   │   ├── JobApi.kt
-│   │   │   └── BidApi.kt
-│   │   ├── response/
-│   │   │   ├── JobResponse.kt
-│   │   │   └── BidResponse.kt
-│   │   └── mapper/
-│   │       ├── JobMapper.kt
-│   │       └── BidMapper.kt
-│   └── repository/
-│       ├── JobRepositoryImpl.kt
-│       └── BidRepositoryImpl.kt
+│   └── remote/
+│       ├── api/
+│       │   ├── AuthApi.kt
+│       │   ├── JobApi.kt
+│       │   └── BidApi.kt
+│       ├── response/
+│       │   ├── AuthResponse.kt
+│       │   ├── JobResponse.kt
+│       │   └── BidResponse.kt
+│       └── mapper/
+│           ├── JobMapper.kt
+│           └── BidMapper.kt
+├── domain/
+│   ├── ...
+│   └── source/
+│       └── GoogleAuthSource.kt      ← interface for platform auth; impl lives in androidMain
 └── presentation/
+    ├── auth/
+    │   ├── LoginViewModel.kt
+    │   └── LoginState.kt
     ├── job/
     │   ├── JobListViewModel.kt
     │   ├── JobListState.kt
@@ -242,12 +242,22 @@ shared/commonMain/kotlin/com/example/handify/
         ├── PlaceBidViewModel.kt
         └── PlaceBidState.kt
 ```
+> **Note:** `data/repository/` for auth is absent from shared — `AuthRepositoryImpl` lives in `composeApp/androidMain/data/repository/` because it uses Android-specific classes. Repository impls for features with no platform dependencies (Job, Bid) go in `shared/data/repository/`.
+
+> **Future — persistent auth token storage:** when implementing token persistence (auth checks, Bearer token injection), define `interface TokenStorage` in `shared/commonMain/domain/source/`, implement `AndroidTokenStorage` in `composeApp/androidMain/` (DataStore or SharedPreferences), and `IosTokenStorage` in `iosApp/` (Keychain). Never add token storage code until it is actually read and used somewhere.
 
 ### composeApp/androidMain
 ```
 composeApp/androidMain/kotlin/com/example/handify/
+├── data/
+│   ├── remote/
+│   │   └── source/
+│   │       └── AndroidGoogleAuthSource.kt  ← implements GoogleAuthSource via CredentialManager
+│   └── repository/
+│       └── AuthRepositoryImpl.kt    ← in androidMain because AuthApi is enough for now
 ├── ui/
 │   ├── screen/
+│   │   ├── LoginScreen.kt
 │   │   ├── JobListScreen.kt
 │   │   ├── JobDetailScreen.kt
 │   │   ├── CreateJobScreen.kt
@@ -263,7 +273,8 @@ composeApp/androidMain/kotlin/com/example/handify/
 │   ├── AppNavigation.kt
 │   └── Routes.kt
 ├── di/
-│   └── AppModule.kt
+│   └── AppModule.kt                 ← registers Android-specific + auth bindings
+├── HandifyApplication.kt
 └── MainActivity.kt
 ```
 
@@ -503,6 +514,9 @@ fun Route.jobRoutes(repository: JobRepository) {
 8. **State is immutable** — always use `copy()` to update state, never mutate directly
 9. **No comments in code** — write self-explanatory code; do not add any inline comments, block comments, or KDoc
 10. **No AI slop** — no filler phrases, no over-engineering, no unnecessary abstractions, no placeholder text, no TODO comments
+11. **No dead code** — never add methods, fields, or classes that are not called by something. If you save data, something must read it. If you define an interface method, something must call it
+12. **ViewModels always live in shared** — never move a ViewModel to a platform module. If it needs a platform capability, define an interface in `shared/commonMain/domain/source/`, implement it in `composeApp/androidMain/`, and inject it via Koin
+13. **Platform source implementations go in `composeApp/androidMain/data/source/`** — named `Android<Name>` (e.g. `AndroidGoogleAuthSource`), registered in Koin as the interface type
 
 ---
 
@@ -514,11 +528,14 @@ Always follow this order. Never start with UI before the domain exists.
 1. shared/domain/model/                      → add or update domain model
 2. shared/domain/repository/                 → add method to repository interface
 3. shared/domain/usecase/                    → create use case ONLY if real logic is needed
-4. shared/data/response/                     → add Response model (@Serializable)
+4. shared/data/remote/response/              → add Response model (@Serializable)
 5. shared/data/remote/api/                   → add API call
-6. shared/data/mapper/                       → add mapper Response → domain
-7. shared/data/repository/                   → implement repository method (client side)
-8. shared/presentation/                      → add ViewModel + State
+6. shared/data/remote/mapper/                → add mapper Response → domain
+7. shared/data/repository/  OR               → implement repository (if no platform APIs needed)
+   composeApp/androidMain/data/repository/   → implement repository (if Android APIs needed)
+7b. shared/domain/source/ + androidMain/data/source/ → if ViewModel needs a platform capability:
+                                               define interface in shared, implement Android class in androidMain
+8. shared/presentation/                      → add ViewModel + State (always in shared)
 9. server/features/<feature>/domain/         → add domain model + repository interface + use case
 10. server/features/<feature>/data/          → implement repository + table + queries
 11. server/features/<feature>/api/           → add routes + request/response models
@@ -560,7 +577,7 @@ iOS builds must be done via Xcode — open `iosApp/` in Xcode.
 ## Key Versions
 - Kotlin: 2.3.0
 - Ktor: 3.3.3
-- Koin: 4.0.0
+- Koin: 4.1.0
 - Android minSdk: 24 / targetSdk: 36
 - JVM target: 11
 
