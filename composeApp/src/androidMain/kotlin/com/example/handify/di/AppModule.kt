@@ -11,6 +11,7 @@ import com.example.handify.domain.source.GoogleAuthSource
 import com.example.handify.domain.source.TokenStorage
 import com.example.handify.presentation.auth.LoginViewModel
 import com.example.handify.presentation.job.JobListViewModel
+import com.example.handify.presentation.job.MyJobsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -29,4 +30,5 @@ val appModule = module {
 
     viewModel { LoginViewModel(get(), get()) }
     viewModel { JobListViewModel(get()) }
+    viewModel { MyJobsViewModel(get()) }
 }

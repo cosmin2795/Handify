@@ -9,4 +9,7 @@ class JobRepositoryImpl(private val jobApi: JobApi) : JobRepository {
 
     override suspend fun getJobs(): List<Job> =
         jobApi.getJobs().map { it.toDomain() }
+
+    override suspend fun getMyJobs(): List<Job> =
+        jobApi.getMyJobs().map { it.toDomain() }
 }

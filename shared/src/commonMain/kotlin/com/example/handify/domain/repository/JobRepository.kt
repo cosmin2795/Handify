@@ -4,4 +4,5 @@ import com.example.handify.domain.model.Job
 
 interface JobRepository {
     suspend fun getJobs(): List<Job>
+    suspend fun getMyJobs(): List<Job>
 }

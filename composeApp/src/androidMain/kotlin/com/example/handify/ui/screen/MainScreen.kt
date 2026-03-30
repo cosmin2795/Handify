@@ -46,7 +46,7 @@ fun MainScreen(viewModel: JobListViewModel = koinViewModel()) {
                     onSortSelect = viewModel::selectSort,
                     onRetry = viewModel::loadJobs
                 )
-                Tab.MY_JOBS -> PlaceholderTab(label = "My Jobs")
+                Tab.MY_JOBS -> MyJobsScreen()
                 Tab.MESSAGES -> PlaceholderTab(label = "Messages")
                 Tab.PROFILE -> PlaceholderTab(label = "Profile")
             }

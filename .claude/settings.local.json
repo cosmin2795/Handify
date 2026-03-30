@@ -41,7 +41,8 @@
       "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -30)",
       "Bash(./gradlew :server:compileKotlin 2>&1 | tail -30)",
       "Bash(./gradlew :server:compileKotlin 2>&1 | tail -10)",
-      "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -15)"
+      "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -15)",
+      "Bash(./gradlew :composeApp:compileDebugKotlin :server:compileKotlin 2>&1 | tail -20)"
     ]
   }
 }

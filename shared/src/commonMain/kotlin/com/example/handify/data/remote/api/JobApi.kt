@@ -9,4 +9,7 @@ class JobApi(private val client: HttpClient, private val baseUrl: String) {
 
     suspend fun getJobs(): List<JobResponse> =
         client.get("$baseUrl/api/jobs").body()
+
+    suspend fun getMyJobs(): List<JobResponse> =
+        client.get("$baseUrl/api/jobs/mine").body()
 }
