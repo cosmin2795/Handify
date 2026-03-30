@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.handify.ui.screen.LoginScreen
+import com.example.handify.ui.screen.MainScreen
 
 @Composable
 fun AppNavigation() {
@@ -25,8 +26,7 @@ fun AppNavigation() {
         }
 
         composable(Routes.Home.route) {
-            // TODO: Replace with real HomeScreen
-            androidx.compose.material3.Text("Welcome to Handify!")
+            MainScreen()
         }
     }
 }

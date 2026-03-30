@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Handify</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --forest: #2D5A3D;
+  --forest-light: #3A7A50;
+  --sage: #8CAA7E;
+  --sage-light: #B5CA8D;
+  --slate: #2C3E50;
+  --slate-dark: #1A252F;
+  --ember: #D4572A;
+  --ember-dark: #B8431E;
+  --sand: #F5F0E8;
+  --sand-dark: #E8E0D0;
+  --cream: #FDFBF7;
+  --white: #FFFFFF;
+  --grey-100: #F3F1ED;
+  --grey-200: #E0DDD6;
+  --grey-300: #C4C0B8;
+  --grey-400: #9A958B;
+  --grey-500: #706B62;
+  --grey-600: #504C45;
+  --text: #1C1B18;
+  --text-mid: #3D3A34;
+  --text-muted: #7A756B;
+  --shadow-sm: 0 1px 3px rgba(28,27,24,0.06);
+  --shadow-md: 0 4px 12px rgba(28,27,24,0.08);
+  --shadow-lg: 0 8px 24px rgba(28,27,24,0.12);
+  --radius: 10px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { font-family:var(--font-body); background:var(--sand); color:var(--text); overflow:hidden; height:100%; width:100%; -webkit-font-smoothing:antialiased; }
+#root { height:100%; width:100%; }
+input, textarea, button, select { font-family:var(--font-body); outline:none; border:none; }
+button { cursor:pointer; -webkit-appearance:none; }
+button:active { transform:scale(0.97); }
+::-webkit-scrollbar { display:none; }
+
+@keyframes fadeInUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+@keyframes slideDown { from{transform:translateY(-12px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes scaleIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes checkDraw { 0%{stroke-dashoffset:24} 100%{stroke-dashoffset:0} }
+@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(212,87,42,0.4)} 50%{box-shadow:0 0 0 6px rgba(212,87,42,0)} }
+@keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ================================================================
+   DATA
+   ================================================================ */
+const CATEGORIES = [
+  { id:'all', label:'All', icon:'grid' },
+  { id:'trades', label:'Trades', icon:'hammer' },
+  { id:'cleaning', label:'Cleaning', icon:'sparkle' },
+  { id:'moving', label:'Moving', icon:'truck' },
+  { id:'garden', label:'Garden', icon:'leaf' },
+  { id:'events', label:'Events', icon:'calendar' },
+  { id:'repairs', label:'Repairs', icon:'wrench' },
+  { id:'transport', label:'Transport', icon:'car' },
+];
+
+const JOBS_FEED = [
+  { id:1, title:'Paint bedroom walls, 160 sq ft', cat:'cleaning', loc:'Brooklyn Heights', budget:'$400 - $600', duration:'2-3 days', applicants:3, time:'5h ago', poster:'Sarah Mitchell', posterInit:'SM', rating:4.7, desc:'Looking for an experienced painter to repaint a 160 sq ft bedroom. Walls are in good condition, just need a color change from beige to sage green. Paint will be provided.', isNew:false, isUrgent:false },
+  { id:2, title:'Assemble IKEA furniture (3 pieces)', cat:'trades', loc:'Manhattan, Midtown', budget:'$250 - $350', duration:'1 day', applicants:5, time:'1h ago', poster:'Dan Cooper', posterInit:'DC', rating:4.9, desc:'Need help assembling 3 IKEA pieces: a PAX wardrobe, MALM dresser, and BEKANT desk. All parts and tools included. Apartment is on the 4th floor with elevator.', isNew:true, isUrgent:false },
+  { id:3, title:'Move studio apartment across town', cat:'moving', loc:'Queens to Astoria', budget:'$700 - $900', duration:'1 day', applicants:2, time:'8h ago', poster:'Elena Rodriguez', posterInit:'ER', rating:4.6, desc:'Moving a studio apartment from Queens to Astoria. Standard furniture: sofa, dining table, wardrobe, fridge, and washer. About 15 boxes total. Need a truck.', isNew:false, isUrgent:false },
+  { id:4, title:'Trim hedges and rake garden', cat:'garden', loc:'Park Slope', budget:'$200 - $300', duration:'Flexible', applicants:1, time:'1d ago', poster:'Brian Walsh', posterInit:'BW', rating:4.8, desc:'Hedge row is about 65 ft long and 5 ft tall. Garden is roughly 1,000 sq ft. Need trimming, raking, and general cleanup. All green waste to be bagged.', isNew:false, isUrgent:false },
+  { id:5, title:'Photographer for christening (4h)', cat:'events', loc:'Upper East Side', budget:'$800 - $1,200', duration:'1 day', applicants:7, time:'30m ago', poster:'Joanna Park', posterInit:'JP', rating:5.0, desc:'Looking for a professional photographer for our daughter\'s christening. Event will last about 4 hours including the church ceremony and the reception. Need both candid and posed shots.', isNew:false, isUrgent:true },
+  { id:6, title:'Fix leaking faucet + new fixture', cat:'repairs', loc:'Williamsburg', budget:'$150 - $250', duration:'Half day', applicants:4, time:'3h ago', poster:'Mike Tanaka', posterInit:'MT', rating:4.5, desc:'Bathroom faucet has a constant drip. Want a full replacement with a new fixture that I will supply. Also need the shut-off valve checked. Old building, copper pipes.', isNew:false, isUrgent:false },
+  { id:7, title:'Deep clean 2-bed apartment', cat:'cleaning', loc:'Chelsea', budget:'$300 - $450', duration:'1 day', applicants:6, time:'2h ago', poster:'Lisa Chen', posterInit:'LC', rating:4.8, desc:'Post-renovation deep cleaning needed for a 2-bedroom apartment. Dust everywhere, windows need washing inside, kitchen and bathrooms need full scrubbing. About 900 sq ft.', isNew:true, isUrgent:false },
+];
+
+const MY_JOBS = [
+  { id:101, title:'Install hardwood flooring 220 sq ft', cat:'trades', status:'active', applicants:6, loc:'Fort Greene', budget:'$800 - $1,200', duration:'2-3 days', desc:'Need hardwood laminate flooring installed in a bedroom. Subfloor is level concrete. Materials will be on site. Room needs baseboards removed and replaced after.' },
+  { id:102, title:'Weekly house cleaning service', cat:'cleaning', status:'active', applicants:3, loc:'SoHo', budget:'$120 - $180/wk', duration:'Ongoing', desc:'Looking for reliable weekly cleaning for a 1,200 sq ft loft. General cleaning, vacuuming, mopping, bathroom and kitchen deep clean.' },
+  { id:103, title:'Repaint kitchen cabinets', cat:'trades', status:'draft', applicants:0, loc:'Greenpoint', budget:'$500 - $700', duration:'3-4 days', desc:'12 cabinet doors and drawer fronts need sanding, priming and painting. Currently dark oak, want matte white.' },
+  { id:104, title:'Garden spring cleanup', cat:'garden', status:'completed', applicants:4, loc:'Carroll Gardens', budget:'$250 - $350', duration:'1 day', desc:'Full spring cleanup: leaf removal, bed edging, mulching, and pruning of 3 rose bushes. About 800 sq ft backyard garden.' },
+  { id:105, title:'Move office furniture', cat:'moving', status:'completed', applicants:5, loc:'DUMBO', budget:'$600 - $900', duration:'1 day', desc:'Relocated 8 desks, filing cabinets, and conference table from 3rd floor to new office space 2 blocks away. Completed on time.' },
+];
+
+const APPLICANTS = [
+  { id:1, name:'Alex Porter', rating:4.8, jobs:23, pitch:'5 years experience installing hardwood. I work clean, fast, and always leave the site spotless. Can start this weekend.', price:'$950', init:'AP' },
+  { id:2, name:'Chris Mendez', rating:4.6, jobs:15, pitch:'Licensed contractor, 3 years in flooring. I have all the tools needed and can bring an extra set of baseboards if needed.', price:'$1,000', init:'CM' },
+  { id:3, name:'Victor Reeves', rating:4.9, jobs:41, pitch:'Flooring specialist — laminate, hardwood, and engineered. I guarantee my work with a 1-year warranty on installation.', price:'$1,100', init:'VR' },
+  { id:4, name:'Ian Bradley', rating:4.4, jobs:9, pitch:'Reliable and affordable. I can complete the job in 2 days with quality materials and clean finish.', price:'$850', init:'IB' },
+  { id:5, name:'Frank Murray', rating:4.7, jobs:28, pitch:'Two-person crew, we can knock this out in 2 days flat. Experienced with laminate on concrete subfloors.', price:'$1,050', init:'FM' },
+  { id:6, name:'George Tomlin', rating:4.5, jobs:19, pitch:'7 years in the trade. Fair price, solid work. Happy to show references from similar jobs in the neighborhood.', price:'$900', init:'GT' },
+];
+
+const MY_APPS = [
+  { id:1, jobTitle:'Assemble IKEA furniture (3 pieces)', poster:'Dan Cooper', price:'$300', status:'pending', time:'1h ago' },
+  { id:2, jobTitle:'Photographer for christening (4h)', poster:'Joanna Park', price:'$1,000', status:'accepted', time:'2d ago' },
+  { id:3, jobTitle:'Fix leaking faucet + new fixture', poster:'Mike Tanaka', price:'$180', status:'declined', time:'3d ago' },
+];
+
+const CONVERSATIONS = [
+  { id:1, name:'Joanna Park', init:'JP', lastMsg:'Perfect, see you Saturday at 10!', time:'10:23 AM', unread:2, jobTitle:'Photographer for christening', online:true },
+  { id:2, name:'Dan Cooper', init:'DC', lastMsg:'Can you come tomorrow morning?', time:'Yesterday', unread:0, jobTitle:'IKEA furniture assembly', online:false },
+  { id:3, name:'Alex Porter', init:'AP', lastMsg:'I\'ll bring the extra baseboards just in case.', time:'Monday', unread:1, jobTitle:'Hardwood flooring install', online:true },
+];
+
+const MESSAGES_DATA = {
+  1: [
+    { id:1, from:'them', text:'Hi! I saw your application for the christening.', time:'9:15 AM' },
+    { id:2, from:'them', text:'I really like your portfolio. Have you done christenings before?', time:'9:16 AM' },
+    { id:3, from:'me', text:'Hi Joanna! Yes, I\'ve photographed over 20 christenings and baptisms.', time:'9:30 AM' },
+    { id:4, from:'me', text:'I can send you some samples if you\'d like.', time:'9:31 AM' },
+    { id:5, from:'them', text:'That would be great! Also confirming the date — March 22, 10 AM.', time:'9:45 AM' },
+    { id:6, from:'me', text:'Confirmed! I\'ll be there at 9:45 for setup.', time:'10:00 AM' },
+    { id:7, from:'them', text:'Perfect, see you Saturday at 10!', time:'10:23 AM' },
+  ],
+  2: [
+    { id:1, from:'them', text:'Hey, I saw you applied for the furniture assembly.', time:'2:00 PM' },
+    { id:2, from:'me', text:'Yes! I have lots of experience with IKEA builds.', time:'2:15 PM' },
+    { id:3, from:'them', text:'Can you come tomorrow morning?', time:'2:30 PM' },
+  ],
+  3: [
+    { id:1, from:'them', text:'Hi, just wanted to confirm the flooring job details.', time:'11:00 AM' },
+    { id:2, from:'me', text:'Sure! I saw it\'s 220 sq ft of laminate on concrete.', time:'11:10 AM' },
+    { id:3, from:'them', text:'Exactly. I\'ll have all materials on site by Friday.', time:'11:15 AM' },
+    { id:4, from:'me', text:'Perfect. I\'ll plan for a Saturday start then.', time:'11:20 AM' },
+    { id:5, from:'them', text:'I\'ll bring the extra baseboards just in case.', time:'11:25 AM' },
+  ],
+};
+
+/* ================================================================
+   SVG ICONS
+   ================================================================ */
+const I = {
+  home: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  briefcase: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>,
+  chat: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>,
+  user: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  search: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--grey-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+  back: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--slate)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>,
+  close: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--slate)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  plus: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  send: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+  check: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  star: (s=12) => <svg width={s} height={s} viewBox="0 0 24 24" fill="#D4A030" stroke="#D4A030" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+  mapPin: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>,
+  clock: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--grey-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+  dollar: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>,
+  camera: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--grey-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>,
+  filter: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--grey-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+  chevDown: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>,
+  chevRight: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--grey-300)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+  mail: <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>,
+  shield: <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--forest)" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10" stroke="white" strokeWidth="2.5"/></svg>,
+  bolt: <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--ember)" stroke="var(--ember)" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  grid: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>,
+  hammer: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 12l-8.5 8.5a2.12 2.12 0 01-3-3L12 9"/><path d="M17.64 15L22 10.64"/><path d="M20.91 11.7l-1.25-1.25a2.12 2.12 0 00-3 0L14 13.17"/><path d="M18 2l-2.5 2.5L18 7l2.5-2.5z"/></svg>,
+  sparkle: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>,
+  truck: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>,
+  leaf: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L7 18h0c4-1 7-4 8-8 1 4 2 7 2 10h2c0-5-2-11-2-12 0 0 3-2 7-2 0-6-8-8-8-8h-1z"/></svg>,
+  calendar: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  wrench: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>,
+  car: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 17h14M5 17a2 2 0 01-2-2V9a2 2 0 012-2h1l2-3h8l2 3h1a2 2 0 012 2v6a2 2 0 01-2 2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>,
+  settings: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
+  helpCircle: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+  logOut: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C0392B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+  bell: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>,
+  fileText: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
+  bookmark: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>,
+  users: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--grey-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
+};
+
+const catIcon = (id, color) => {
+  const icons = { all:I.grid, trades:I.hammer, cleaning:I.sparkle, moving:I.truck, garden:I.leaf, events:I.calendar, repairs:I.wrench, transport:I.car };
+  return <span style={{color:color||'currentColor',display:'flex'}}>{icons[id] || I.grid}</span>;
+};
+
+const CAT_COLORS = { trades:'#8B5E3C', cleaning:'var(--sage)', moving:'var(--slate)', garden:'var(--forest)', events:'var(--slate-dark)', repairs:'#6B5B4F', transport:'#7A6840' };
+
+/* ================================================================
+   COMPONENTS
+   ================================================================ */
+const Avatar = ({init, size=40, bg='var(--forest)'}) => (
+  <div style={{width:size,height:size,borderRadius:'50%',background:bg,display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontWeight:700,fontSize:size*0.32,flexShrink:0,letterSpacing:0.5}}>
+    {init}
+  </div>
+);
+
+/* ================================================================
+   MAIN APP
+   ================================================================ */
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [auth, setAuth] = useState('welcome'); // welcome, login, register, otp, forgot
+  const [regStep, setRegStep] = useState(1);
+  const [otp, setOtp] = useState(['','','','','','']);
+  const [otpTimer, setOtpTimer] = useState(45);
+  const [forgotSent, setForgotSent] = useState(false);
+
+  const [tab, setTab] = useState('home');
+  const [selCat, setSelCat] = useState('all');
+  const [selSort, setSelSort] = useState('recent');
+  const [selJob, setSelJob] = useState(null);
+  const [showApply, setShowApply] = useState(false);
+  const [applyDone, setApplyDone] = useState(false);
+
+  const [showPost, setShowPost] = useState(false);
+  const [postStep, setPostStep] = useState(1);
+  const [postDone, setPostDone] = useState(false);
+  const [post, setPost] = useState({title:'',cat:'',urgent:false,desc:'',loc:'',date:null,duration:'',budget:'',workers:1});
+
+  const [myTab, setMyTab] = useState('active');
+  const [selMyJob, setSelMyJob] = useState(null);
+
+  const [selChat, setSelChat] = useState(null);
+  const [chatIn, setChatIn] = useState('');
+  const [msgs, setMsgs] = useState(MESSAGES_DATA);
+
+  const [appTab, setAppTab] = useState('pending');
+
+  const otpRefs = useRef([]);
+
+  useEffect(() => {
+    if (auth === 'otp' && otpTimer > 0) {
+      const t = setTimeout(() => setOtpTimer(otpTimer - 1), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [auth, otpTimer]);
+
+  const doLogin = () => { setLoggedIn(true); setTab('home'); };
+
+  /* ──── STYLES ──── */
+  const S = {
+    screen: { height:'100%', width:'100%', display:'flex', flexDirection:'column', background:'var(--sand)', position:'relative', overflow:'hidden' },
+    safeTop: { paddingTop:'max(var(--safe-top), 20px)' },
+    safeBot: { paddingBottom:'max(var(--safe-bottom), 20px)' },
+    header: { padding:'12px 20px 8px', display:'flex', alignItems:'center', justifyContent:'space-between', background:'var(--sand)', zIndex:10 },
+    scroll: { flex:1, overflowY:'auto', overflowX:'hidden', WebkitOverflowScrolling:'touch' },
+    card: { background:'var(--cream)', borderRadius:'var(--radius)', padding:'16px', margin:'0 20px 12px', boxShadow:'var(--shadow-sm)', border:'1px solid var(--grey-200)' },
+    btn: { display:'flex', alignItems:'center', justifyContent:'center', padding:'14px 24px', borderRadius:'var(--radius-sm)', fontWeight:600, fontSize:15, minHeight:48, transition:'all 0.15s ease' },
+    btnEmber: { background:'var(--ember)', color:'white' },
+    btnForest: { background:'var(--forest)', color:'white' },
+    btnOutline: { background:'transparent', border:'2px solid var(--grey-200)', color:'var(--text)' },
+    input: { width:'100%', padding:'14px 16px', borderRadius:'var(--radius-sm)', border:'2px solid var(--grey-200)', fontSize:15, background:'var(--cream)', color:'var(--text)', minHeight:48, transition:'border 0.2s' },
+    chip: { display:'inline-flex', alignItems:'center', padding:'8px 14px', borderRadius:'var(--radius-xs)', fontSize:13, fontWeight:500, whiteSpace:'nowrap', minHeight:36 },
+    nav: { display:'flex', alignItems:'flex-end', justifyContent:'space-around', padding:'8px 12px', paddingBottom:'max(var(--safe-bottom), 10px)', background:'var(--cream)', borderTop:'1px solid var(--grey-200)', position:'relative', zIndex:100 },
+    modal: { position:'fixed', inset:0, zIndex:200, background:'var(--sand)', display:'flex', flexDirection:'column', animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)' },
+    overlay: { position:'fixed', inset:0, zIndex:190, background:'rgba(0,0,0,0.4)', animation:'fadeIn 0.2s ease' },
+    badge: { background:'var(--ember)', color:'white', fontSize:10, fontWeight:800, minWidth:18, height:18, borderRadius:9, display:'flex', alignItems:'center', justifyContent:'center', padding:'0 5px' },
+  };
+
+  /* ════════════════════════════════════════════
+     AUTH SCREENS
+     ════════════════════════════════════════════ */
+  const renderAuth = () => {
+    if (auth === 'welcome') return (
+      <div style={{...S.screen,...S.safeTop,...S.safeBot,justifyContent:'space-between',padding:'0 24px'}}>
+        <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',animation:'fadeIn 0.6s ease'}}>
+          <div style={{width:72,height:72,borderRadius:16,background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:20,boxShadow:'0 8px 32px rgba(45,90,61,0.3)'}}>
+            <span style={{fontSize:32,color:'white',fontFamily:'var(--font-display)',fontWeight:700}}>H</span>
+          </div>
+          <h1 style={{fontFamily:'var(--font-display)',fontSize:34,color:'var(--slate-dark)',marginBottom:6,fontWeight:700}}>Handify</h1>
+          <p style={{color:'var(--text-muted)',fontSize:16,fontWeight:500,letterSpacing:0.3}}>Local work, trusted hands.</p>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:12,paddingBottom:20,animation:'fadeInUp 0.5s ease 0.2s both'}}>
+          <button onClick={doLogin} style={{...S.btn,background:'var(--cream)',border:'2px solid var(--grey-200)',color:'var(--text)',gap:10,boxShadow:'var(--shadow-sm)'}}>
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+          <button onClick={doLogin} style={{...S.btn,background:'#1877F2',color:'white',gap:10}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Continue with Facebook
+          </button>
+          <button onClick={() => setAuth('register')} style={{...S.btn,...S.btnEmber}}>Sign up with Email</button>
+          <button onClick={() => setAuth('login')} style={{...S.btn,background:'transparent',color:'var(--text-muted)',fontSize:14,minHeight:44}}>
+            Already have an account? <span style={{color:'var(--forest)',fontWeight:700,marginLeft:4}}>Log in</span>
+          </button>
+        </div>
+      </div>
+    );
+
+    if (auth === 'login') return (
+      <div style={{...S.screen,...S.safeTop,...S.safeBot,padding:'0 24px'}}>
+        <div style={{padding:'12px 0'}}>
+          <button onClick={() => setAuth('welcome')} style={{background:'none',padding:8,marginLeft:-8,minHeight:44,minWidth:44,display:'flex',alignItems:'center'}}>{I.back}</button>
+        </div>
+        <div style={{animation:'fadeInUp 0.4s ease'}}>
+          <h1 style={{fontFamily:'var(--font-display)',fontSize:28,color:'var(--slate-dark)',marginBottom:6}}>Welcome back</h1>
+          <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:28}}>Log in to continue.</p>
+          <div style={{display:'flex',flexDirection:'column',gap:14}}>
+            <input style={S.input} placeholder="Email" type="email" />
+            <input style={S.input} placeholder="Password" type="password" />
+            <button onClick={() => setAuth('forgot')} style={{background:'none',color:'var(--forest)',fontSize:13,fontWeight:700,textAlign:'right',padding:'4px 0',minHeight:44,display:'flex',alignItems:'center',justifyContent:'flex-end'}}>Forgot password?</button>
+            <button onClick={doLogin} style={{...S.btn,...S.btnEmber,marginTop:4}}>Log In</button>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (auth === 'register') return (
+      <div style={{...S.screen,...S.safeTop,...S.safeBot,padding:'0 24px'}}>
+        <div style={{padding:'12px 0'}}>
+          <button onClick={() => { if(regStep>1) setRegStep(1); else setAuth('welcome'); }} style={{background:'none',padding:8,marginLeft:-8,minHeight:44,minWidth:44,display:'flex',alignItems:'center'}}>{I.back}</button>
+        </div>
+        <div style={{height:4,borderRadius:2,background:'var(--grey-200)',marginBottom:24,overflow:'hidden'}}>
+          <div style={{height:'100%',borderRadius:2,background:'var(--forest)',width:regStep===1?'50%':'100%',transition:'width 0.5s cubic-bezier(0.4,0,0.2,1)'}}/>
+        </div>
+        <div style={{animation:'fadeInUp 0.4s ease'}} key={regStep}>
+          <h1 style={{fontFamily:'var(--font-display)',fontSize:28,color:'var(--slate-dark)',marginBottom:6}}>
+            {regStep === 1 ? 'Create account' : 'Security'}
+          </h1>
+          <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:28}}>Step {regStep} of 2</p>
+          {regStep === 1 ? (
+            <div style={{display:'flex',flexDirection:'column',gap:14}}>
+              <input style={S.input} placeholder="Full name" />
+              <input style={S.input} placeholder="Email" type="email" />
+              <input style={S.input} placeholder="Phone number" type="tel" />
+              <button onClick={() => setRegStep(2)} style={{...S.btn,...S.btnEmber,marginTop:8}}>Continue</button>
+            </div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:14}}>
+              <input style={S.input} placeholder="Password" type="password" />
+              <input style={S.input} placeholder="Confirm password" type="password" />
+              <label style={{display:'flex',alignItems:'flex-start',gap:10,fontSize:13,color:'var(--text-muted)',padding:'8px 0',minHeight:44}}>
+                <input type="checkbox" style={{marginTop:2,width:20,height:20,accentColor:'var(--forest)'}} />
+                <span>I agree to the <span style={{color:'var(--forest)',fontWeight:700}}>Terms of Service</span> and <span style={{color:'var(--forest)',fontWeight:700}}>Privacy Policy</span>.</span>
+              </label>
+              <button onClick={() => { setAuth('otp'); setOtpTimer(45); }} style={{...S.btn,...S.btnEmber,marginTop:8}}>Sign Up</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+
+    if (auth === 'otp') return (
+      <div style={{...S.screen,...S.safeTop,...S.safeBot,padding:'0 24px'}}>
+        <div style={{padding:'12px 0'}}>
+          <button onClick={() => setAuth('register')} style={{background:'none',padding:8,marginLeft:-8,minHeight:44,minWidth:44,display:'flex',alignItems:'center'}}>{I.back}</button>
+        </div>
+        <div style={{animation:'fadeInUp 0.4s ease'}}>
+          <h1 style={{fontFamily:'var(--font-display)',fontSize:28,color:'var(--slate-dark)',marginBottom:6}}>Verification</h1>
+          <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:28}}>Enter the 6-digit code sent to your email.</p>
+          <div style={{display:'flex',gap:10,justifyContent:'center',marginBottom:24}}>
+            {otp.map((d,i) => (
+              <input key={i} ref={el => otpRefs.current[i]=el} value={d} maxLength={1} inputMode="numeric"
+                style={{width:48,height:56,textAlign:'center',fontSize:22,fontWeight:700,borderRadius:'var(--radius-sm)',border:`2px solid ${d?'var(--forest)':'var(--grey-200)'}`,background:'var(--cream)',transition:'border 0.2s',color:'var(--text)'}}
+                onChange={e => { const v=e.target.value.replace(/\D/,''); const n=[...otp]; n[i]=v; setOtp(n); if(v&&i<5) otpRefs.current[i+1]?.focus(); }}
+                onKeyDown={e => { if(e.key==='Backspace'&&!otp[i]&&i>0) otpRefs.current[i-1]?.focus(); }}
+              />
+            ))}
+          </div>
+          <button onClick={doLogin} disabled={otp.some(d=>!d)} style={{...S.btn,...S.btnEmber,width:'100%',opacity:otp.some(d=>!d)?0.5:1}}>Verify</button>
+          <p style={{textAlign:'center',marginTop:16,fontSize:13,color:'var(--text-muted)'}}>
+            {otpTimer > 0 ? `Resend in 0:${otpTimer.toString().padStart(2,'0')}` :
+              <button onClick={() => setOtpTimer(45)} style={{background:'none',color:'var(--forest)',fontWeight:700,fontSize:13,minHeight:44}}>Resend code</button>
+            }
+          </p>
+        </div>
+      </div>
+    );
+
+    if (auth === 'forgot') return (
+      <div style={{...S.screen,...S.safeTop,...S.safeBot,padding:'0 24px'}}>
+        <div style={{padding:'12px 0'}}>
+          <button onClick={() => {setAuth('login');setForgotSent(false);}} style={{background:'none',padding:8,marginLeft:-8,minHeight:44,minWidth:44,display:'flex',alignItems:'center'}}>{I.back}</button>
+        </div>
+        <div style={{animation:'fadeInUp 0.4s ease'}}>
+          {!forgotSent ? (<>
+            <h1 style={{fontFamily:'var(--font-display)',fontSize:28,color:'var(--slate-dark)',marginBottom:6}}>Reset password</h1>
+            <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:28}}>Enter your email and we'll send a reset link.</p>
+            <input style={{...S.input,marginBottom:16}} placeholder="Email" type="email" />
+            <button onClick={() => setForgotSent(true)} style={{...S.btn,...S.btnEmber,width:'100%'}}>Send Reset Link</button>
+          </>) : (
+            <div style={{textAlign:'center',paddingTop:40}}>
+              <div style={{marginBottom:20}}>{I.mail}</div>
+              <h2 style={{fontFamily:'var(--font-display)',fontSize:24,color:'var(--slate-dark)',marginBottom:8}}>Check your email</h2>
+              <p style={{color:'var(--text-muted)',fontSize:14}}>We've sent a password reset link to your email.</p>
+              <button onClick={() => {setAuth('login');setForgotSent(false);}} style={{...S.btn,...S.btnForest,marginTop:24,width:'100%'}}>Back to Login</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
+     JOB CARD
+     ════════════════════════════════════════════ */
+  const JobCard = ({job, idx, onTap, myJob, showActions}) => {
+    const catColor = CAT_COLORS[job.cat] || 'var(--forest)';
+    const catLabel = CATEGORIES.find(c=>c.id===job.cat)?.label || '';
+    return (
+      <div onClick={onTap} style={{
+        ...S.card, borderLeft:`4px solid ${catColor}`, padding:'14px 16px', position:'relative',
+        animation:`fadeInUp 0.35s ease both`, animationDelay:`${(idx||0)*0.05}s`,
+        ...(myJob?.status==='draft' ? {borderStyle:'dashed',borderWidth:2,borderColor:'var(--grey-300)',borderLeftWidth:4,borderLeftColor:catColor} : {})
+      }}>
+        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8,flexWrap:'wrap'}}>
+          <span style={{fontSize:11,fontWeight:700,color:'white',background:catColor,padding:'3px 10px',borderRadius:'var(--radius-xs)',display:'flex',alignItems:'center',gap:4,textTransform:'uppercase',letterSpacing:0.5}}>
+            {catLabel}
+          </span>
+          {job.isNew && <span style={{fontSize:10,fontWeight:800,color:'var(--ember)',background:'rgba(212,87,42,0.1)',padding:'3px 8px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5}}>New</span>}
+          {job.isUrgent && <span style={{fontSize:10,fontWeight:800,color:'white',background:'var(--ember)',padding:'3px 8px',borderRadius:'var(--radius-xs)',display:'flex',alignItems:'center',gap:3,textTransform:'uppercase',letterSpacing:0.5}}>{I.bolt} Urgent</span>}
+          {myJob && <span style={{fontSize:10,fontWeight:700,marginLeft:'auto',padding:'3px 10px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5,
+            ...(myJob.status==='active' ? {background:'rgba(45,90,61,0.1)',color:'var(--forest)'} :
+               myJob.status==='draft' ? {background:'var(--grey-100)',color:'var(--grey-500)',border:'1px dashed var(--grey-300)'} :
+               {background:'rgba(44,62,80,0.08)',color:'var(--slate)'})
+          }}>{myJob.status==='active'?'Active':myJob.status==='draft'?'Draft':'Completed'}</span>}
+        </div>
+        <h3 style={{fontFamily:'var(--font-display)',fontSize:16,color:'var(--slate-dark)',marginBottom:6,fontWeight:600,lineHeight:1.3}}>{job.title}</h3>
+        <p style={{fontSize:13,color:'var(--text-muted)',lineHeight:1.4,marginBottom:10,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{job.desc}</p>
+        <div style={{display:'flex',flexWrap:'wrap',gap:10,fontSize:12,color:'var(--grey-500)',marginBottom:10}}>
+          <span style={{display:'flex',alignItems:'center',gap:3}}>{I.mapPin} {job.loc}</span>
+          <span style={{display:'flex',alignItems:'center',gap:3}}>{I.clock} {job.duration}</span>
+          <span style={{display:'flex',alignItems:'center',gap:3}}>{I.dollar} {job.budget}</span>
+        </div>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <Avatar init={job.posterInit || job.poster?.split(' ').map(w=>w[0]).join('')} size={28} bg={catColor} />
+            <span style={{fontSize:12,fontWeight:600}}>{job.poster}</span>
+            {job.rating && <span style={{display:'flex',alignItems:'center',gap:2,fontSize:12,color:'#D4A030'}}>{I.star(12)} {job.rating}</span>}
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'var(--grey-400)'}}>
+            <span style={{display:'flex',alignItems:'center',gap:3,fontWeight:600,color:job.applicants>0?'var(--forest)':'var(--grey-400)'}}>{I.users} {job.applicants}</span>
+            {job.time && <span>{job.time}</span>}
+          </div>
+        </div>
+        {showActions && (
+          <div style={{display:'flex',gap:8,marginTop:12,paddingTop:12,borderTop:'1px solid var(--grey-200)'}}>
+            {myJob?.status==='active' && <button onClick={e=>{e.stopPropagation();}} style={{...S.chip,background:'rgba(45,90,61,0.08)',color:'var(--forest)',fontSize:12,fontWeight:600,flex:1,justifyContent:'center'}}>View applicants</button>}
+            <button onClick={e=>e.stopPropagation()} style={{...S.chip,background:'rgba(45,90,61,0.08)',color:'var(--forest)',fontSize:12,fontWeight:600,flex:1,justifyContent:'center'}}>Edit</button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
+     HOME
+     ════════════════════════════════════════════ */
+  const renderHome = () => (
+    <div style={S.screen}>
+      <div style={{...S.safeTop,background:'var(--sand)'}}>
+        <div style={S.header}>
+          <button style={{display:'flex',alignItems:'center',gap:4,background:'none',fontSize:14,fontWeight:600,color:'var(--slate-dark)',minHeight:44}}>
+            {I.mapPin} <span style={{marginLeft:2}}>New York</span> {I.chevDown}
+          </button>
+          <span style={{fontFamily:'var(--font-display)',fontSize:20,color:'var(--slate-dark)',fontWeight:700}}>Handify</span>
+          <button style={{background:'none',position:'relative',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            {I.bell}
+            <div style={{position:'absolute',top:6,right:6,width:8,height:8,borderRadius:4,background:'var(--ember)'}}/>
+          </button>
+        </div>
+        <div style={{padding:'4px 20px 12px'}}>
+          <div style={{display:'flex',alignItems:'center',background:'var(--cream)',borderRadius:'var(--radius-sm)',padding:'12px 14px',border:'1px solid var(--grey-200)',gap:10}}>
+            {I.search}
+            <input placeholder="Search for a service..." style={{border:'none',flex:1,fontSize:14,color:'var(--text)',background:'transparent'}} />
+            <button style={{background:'none',padding:4,minWidth:44,minHeight:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.filter}</button>
+          </div>
+        </div>
+        <div style={{padding:'0 0 8px',overflowX:'auto',display:'flex',gap:8,paddingLeft:20,paddingRight:20}}>
+          {CATEGORIES.map(cat => (
+            <button key={cat.id} onClick={() => setSelCat(cat.id)} style={{
+              ...S.chip, gap:5, flexShrink:0,
+              background: selCat===cat.id ? 'var(--forest)' : 'var(--cream)',
+              color: selCat===cat.id ? 'white' : 'var(--text-mid)',
+              border: selCat===cat.id ? 'none' : '1px solid var(--grey-200)',
+              fontSize:13, fontWeight:600
+            }}>
+              {cat.label}
+            </button>
+          ))}
+        </div>
+        <div style={{display:'flex',gap:6,padding:'6px 20px 4px'}}>
+          {[{id:'recent',label:'Recent'},{id:'budgetUp',label:'Budget +'},{id:'budgetDown',label:'Budget -'},{id:'near',label:'Nearby'}].map(sort => (
+            <button key={sort.id} onClick={() => setSelSort(sort.id)} style={{
+              padding:'6px 12px',borderRadius:'var(--radius-xs)',fontSize:11,fontWeight:700,minHeight:32,
+              background:selSort===sort.id?'var(--slate-dark)':'transparent',
+              color:selSort===sort.id?'white':'var(--grey-500)',
+              border:selSort===sort.id?'none':'1px solid var(--grey-300)',
+              textTransform:'uppercase',letterSpacing:0.5
+            }}>{sort.label}</button>
+          ))}
+        </div>
+      </div>
+      <div style={S.scroll}>
+        <div style={{padding:'12px 0 100px'}}>
+          {JOBS_FEED.filter(j => selCat==='all' || j.cat===selCat).map((job,i) => (
+            <JobCard key={job.id} job={job} idx={i} onTap={() => setSelJob(job)} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ════════════════════════════════════════════
+     JOB DETAIL
+     ════════════════════════════════════════════ */
+  const renderJobDetail = () => {
+    const job = selJob;
+    const catColor = CAT_COLORS[job.cat] || 'var(--forest)';
+    const catLabel = CATEGORIES.find(c=>c.id===job.cat)?.label || '';
+    return (
+      <div style={{...S.modal,...S.safeTop}}>
+        <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,borderBottom:'1px solid var(--grey-200)',background:'var(--sand)'}}>
+          <button onClick={() => {setSelJob(null);setShowApply(false);setApplyDone(false);}} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.back}</button>
+          <h2 style={{fontFamily:'var(--font-display)',fontSize:17,color:'var(--slate-dark)',flex:1,fontWeight:600}}>{job.title}</h2>
+        </div>
+        <div style={{...S.scroll,paddingBottom:100}}>
+          <div style={{padding:'16px 20px',animation:'fadeInUp 0.3s ease'}}>
+            <div style={{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap'}}>
+              <span style={{fontSize:11,fontWeight:700,color:'white',background:catColor,padding:'4px 10px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5}}>{catLabel}</span>
+              {job.isUrgent && <span style={{fontSize:11,fontWeight:800,color:'white',background:'var(--ember)',padding:'4px 10px',borderRadius:'var(--radius-xs)',display:'flex',alignItems:'center',gap:3,textTransform:'uppercase',letterSpacing:0.5}}>{I.bolt} Urgent</span>}
+              {job.isNew && <span style={{fontSize:11,fontWeight:800,color:'var(--ember)',background:'rgba(212,87,42,0.1)',padding:'4px 10px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5}}>New</span>}
+            </div>
+
+            <div style={{background:'var(--cream)',borderRadius:'var(--radius)',padding:16,border:'1px solid var(--grey-200)',marginBottom:16}}>
+              <div style={{display:'flex',alignItems:'center',gap:12}}>
+                <Avatar init={job.posterInit} size={48} bg={catColor} />
+                <div style={{flex:1}}>
+                  <div style={{display:'flex',alignItems:'center',gap:6}}>
+                    <span style={{fontWeight:700,fontSize:15}}>{job.poster}</span>
+                    <span style={{display:'flex',alignItems:'center',gap:2,fontSize:11,color:'var(--forest)',fontWeight:700}}>{I.shield} Verified</span>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:4,marginTop:3}}>
+                    {I.star(14)} <span style={{fontSize:13,fontWeight:700,color:'#D4A030'}}>{job.rating}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
+              {[
+                {icon:I.mapPin,label:'Location',val:job.loc},
+                {icon:I.dollar,label:'Budget',val:job.budget},
+                {icon:I.clock,label:'Duration',val:job.duration},
+                {icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--grey-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,label:'When',val:'Flexible'},
+                {icon:I.users,label:'Workers',val:'1'},
+                {icon:I.clock,label:'Posted',val:job.time},
+              ].map((d,i) => (
+                <div key={i} style={{background:'var(--cream)',borderRadius:'var(--radius-sm)',padding:'12px',border:'1px solid var(--grey-200)'}}>
+                  <div style={{fontSize:10,color:'var(--grey-400)',fontWeight:700,marginBottom:4,textTransform:'uppercase',letterSpacing:0.5,display:'flex',alignItems:'center',gap:4}}>{d.icon} {d.label}</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'var(--slate-dark)'}}>{d.val}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{background:'var(--cream)',borderRadius:'var(--radius)',padding:16,border:'1px solid var(--grey-200)',marginBottom:16}}>
+              <h4 style={{fontSize:11,fontWeight:800,color:'var(--slate)',marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Description</h4>
+              <p style={{fontSize:14,color:'var(--text-muted)',lineHeight:1.6}}>{job.desc}</p>
+            </div>
+
+            <div style={{display:'flex',gap:10,overflowX:'auto',paddingBottom:8,marginBottom:16}}>
+              {[1,2,3].map(i => (
+                <div key={i} style={{width:140,height:100,borderRadius:'var(--radius-sm)',background:'var(--grey-100)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--grey-200)'}}>
+                  {I.camera}
+                </div>
+              ))}
+            </div>
+            <div style={{fontSize:12,color:'var(--grey-400)',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:4}}>{I.users} {job.applicants} people applied</div>
+          </div>
+        </div>
+
+        <div style={{padding:'12px 20px',paddingBottom:'max(var(--safe-bottom), 16px)',background:'var(--cream)',borderTop:'1px solid var(--grey-200)',display:'flex',alignItems:'center',justifyContent:'space-between',boxShadow:'0 -2px 10px rgba(0,0,0,0.04)'}}>
+          <div>
+            <div style={{fontSize:11,color:'var(--grey-400)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.5}}>Budget</div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',fontWeight:700}}>{job.budget}</div>
+          </div>
+          <button onClick={() => {setShowApply(true);setApplyDone(false);}} style={{...S.btn,...S.btnEmber,gap:6,padding:'14px 28px'}}>Apply Now</button>
+        </div>
+
+        {showApply && <>
+          <div style={S.overlay} onClick={() => setShowApply(false)} />
+          <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:210,background:'var(--cream)',borderRadius:'16px 16px 0 0',padding:'20px',paddingBottom:'max(var(--safe-bottom), 24px)',animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',maxHeight:'80vh',overflowY:'auto'}}>
+            {!applyDone ? (<>
+              <div style={{width:40,height:4,borderRadius:2,background:'var(--grey-300)',margin:'0 auto 16px'}}/>
+              <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:16,fontWeight:700}}>Apply to this job</h3>
+              <div style={{display:'flex',flexDirection:'column',gap:14}}>
+                <div>
+                  <label style={{fontSize:12,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Your pitch</label>
+                  <textarea placeholder="Why are you the right person for this job?" maxLength={300} style={{...S.input,minHeight:100,resize:'none'}} />
+                  <div style={{fontSize:11,color:'var(--grey-400)',textAlign:'right',marginTop:4}}>0 / 300</div>
+                </div>
+                <div>
+                  <label style={{fontSize:12,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Your proposed price</label>
+                  <input style={S.input} placeholder="e.g. $500" type="text" />
+                  <div style={{fontSize:11,color:'var(--forest)',marginTop:4,fontWeight:500}}>Client budget: {job.budget}</div>
+                </div>
+                <div>
+                  <label style={{fontSize:12,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Availability</label>
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {['Anytime','Mon-Fri','Weekends','Next week'].map(d => (
+                      <button key={d} style={{...S.chip,border:'1.5px solid var(--grey-200)',background:'var(--cream)',fontSize:12,minHeight:40}}>{d}</button>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={() => setApplyDone(true)} style={{...S.btn,...S.btnEmber,marginTop:8}}>Submit Application</button>
+              </div>
+            </>) : (
+              <div style={{textAlign:'center',padding:'20px 0',animation:'scaleIn 0.4s ease'}}>
+                <div style={{width:64,height:64,borderRadius:'50%',background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+                  {I.check}
+                </div>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:6,fontWeight:700}}>Application sent</h3>
+                <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:20}}>You'll be notified when you get a response.</p>
+                <button onClick={() => {setShowApply(false);setSelJob(null);}} style={{...S.btn,...S.btnForest,width:'100%'}}>Back to Feed</button>
+              </div>
+            )}
+          </div>
+        </>}
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
+     MY JOBS
+     ════════════════════════════════════════════ */
+  const renderMyJobs = () => (
+    <div style={S.screen}>
+      <div style={{...S.safeTop,background:'var(--sand)'}}>
+        <div style={{padding:'16px 20px 8px'}}>
+          <h1 style={{fontFamily:'var(--font-display)',fontSize:24,color:'var(--slate-dark)',fontWeight:700}}>My Jobs</h1>
+        </div>
+        <div style={{display:'flex',gap:8,padding:'8px 20px 4px'}}>
+          {[{id:'active',label:'Active'},{id:'draft',label:'Drafts'},{id:'completed',label:'Completed'}].map(t => (
+            <button key={t.id} onClick={() => setMyTab(t.id)} style={{
+              ...S.chip, fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:0.5,
+              background: myTab===t.id ? 'var(--slate-dark)' : 'var(--cream)',
+              color: myTab===t.id ? 'white' : 'var(--grey-500)',
+              border: myTab===t.id ? 'none' : '1px solid var(--grey-200)'
+            }}>{t.label}</button>
+          ))}
+        </div>
+      </div>
+      <div style={S.scroll}>
+        <div style={{padding:'12px 0 100px'}}>
+          {MY_JOBS.filter(j => j.status===myTab).map((job,i) => (
+            <JobCard key={job.id} job={{...job,poster:'You',posterInit:'AR',rating:null,time:null}} idx={i} myJob={job} showActions onTap={() => setSelMyJob(job)} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ════════════════════════════════════════════
+     MY JOB DETAIL (applicants)
+     ════════════════════════════════════════════ */
+  const renderMyJobDetail = () => {
+    const job = selMyJob;
+    const catColor = CAT_COLORS[job.cat] || 'var(--forest)';
+    return (
+      <div style={{...S.modal,...S.safeTop}}>
+        <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,borderBottom:'1px solid var(--grey-200)',background:'var(--sand)'}}>
+          <button onClick={() => setSelMyJob(null)} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.back}</button>
+          <h2 style={{fontFamily:'var(--font-display)',fontSize:17,color:'var(--slate-dark)',flex:1,fontWeight:600}}>{job.title}</h2>
+        </div>
+        <div style={S.scroll}>
+          <div style={{padding:'16px 20px 100px',animation:'fadeInUp 0.3s ease'}}>
+            <div style={{background:'var(--cream)',borderRadius:'var(--radius)',padding:16,border:'1px solid var(--grey-200)',marginBottom:16}}>
+              <div style={{display:'flex',flexWrap:'wrap',gap:10,fontSize:12,color:'var(--grey-500)',marginBottom:8}}>
+                <span style={{display:'flex',alignItems:'center',gap:3}}>{I.mapPin} {job.loc}</span>
+                <span style={{display:'flex',alignItems:'center',gap:3}}>{I.dollar} {job.budget}</span>
+                <span style={{display:'flex',alignItems:'center',gap:3}}>{I.clock} {job.duration}</span>
+              </div>
+              <p style={{fontSize:14,color:'var(--text-muted)',lineHeight:1.5}}>{job.desc}</p>
+            </div>
+
+            <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',marginBottom:12,fontWeight:700}}>Applicants ({job.applicants})</h3>
+            {APPLICANTS.slice(0, job.applicants).map((app,i) => (
+              <div key={app.id} style={{...S.card,animation:`fadeInUp 0.3s ease ${i*0.05}s both`}}>
+                <div style={{display:'flex',gap:12,marginBottom:10}}>
+                  <Avatar init={app.init} size={44} bg={catColor} />
+                  <div style={{flex:1}}>
+                    <div style={{display:'flex',alignItems:'center',gap:6}}>
+                      <span style={{fontWeight:700,fontSize:14}}>{app.name}</span>
+                      <span style={{display:'flex',alignItems:'center',gap:2,fontSize:12,color:'#D4A030'}}>{I.star(12)} {app.rating}</span>
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:8,marginTop:3}}>
+                      <span style={{fontSize:13,fontWeight:700,color:'var(--forest)'}}>{app.price}</span>
+                      <span style={{fontSize:11,color:'var(--grey-400)'}}>{app.jobs} jobs done</span>
+                    </div>
+                  </div>
+                </div>
+                <p style={{fontSize:13,color:'var(--text-muted)',lineHeight:1.4,marginBottom:12}}>{app.pitch}</p>
+                <div style={{display:'flex',gap:8}}>
+                  <button style={{...S.chip,background:'var(--ember)',color:'white',flex:1,justifyContent:'center',fontWeight:700,fontSize:12,minHeight:40}}>Accept</button>
+                  <button style={{...S.chip,border:'1.5px solid var(--grey-300)',background:'var(--cream)',flex:1,justifyContent:'center',fontSize:12,fontWeight:600,minHeight:40}}>Decline</button>
+                  <button style={{...S.chip,background:'rgba(45,90,61,0.08)',color:'var(--forest)',justifyContent:'center',fontSize:12,padding:'8px 14px',minHeight:40,fontWeight:600}}>Message</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
+     POST JOB
+     ════════════════════════════════════════════ */
+  const renderPostJob = () => {
+    const dates = Array.from({length:14},(_,i) => {
+      const d = new Date(); d.setDate(d.getDate()+i);
+      return { day:d.getDate(), wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()], full:d.toISOString().slice(0,10) };
+    });
+    const closePost = () => { setShowPost(false); setPostStep(1); setPostDone(false); setPost({title:'',cat:'',urgent:false,desc:'',loc:'',date:null,duration:'',budget:'',workers:1}); };
+    return (
+      <div style={{...S.modal,...S.safeTop}}>
+        <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,background:'var(--sand)'}}>
+          <button onClick={closePost} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.close}</button>
+          <h2 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',flex:1,fontWeight:700}}>Post a Job</h2>
+          <span style={{fontSize:12,color:'var(--grey-400)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>Step {postStep}/3</span>
+        </div>
+        <div style={{height:4,background:'var(--grey-200)',margin:'0 20px',borderRadius:2,overflow:'hidden'}}>
+          <div style={{height:'100%',background:'var(--forest)',borderRadius:2,width:`${(postStep/3)*100}%`,transition:'width 0.5s cubic-bezier(0.4,0,0.2,1)'}}/>
+        </div>
+        {!postDone ? (
+          <div style={S.scroll}>
+            <div style={{padding:'20px 20px 100px',animation:'fadeInUp 0.3s ease'}} key={postStep}>
+              {postStep === 1 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>What do you need?</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>Pick a category and describe briefly.</p>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Title</label>
+                  <input style={S.input} placeholder="e.g. Install bedroom shelves" value={post.title} onChange={e => setPost({...post,title:e.target.value})} />
+                </div>
+                <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:10,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Category</label>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+                  {CATEGORIES.filter(c=>c.id!=='all').map(cat => (
+                    <button key={cat.id} onClick={() => setPost({...post,cat:cat.id})} style={{
+                      padding:'14px 12px',borderRadius:'var(--radius-sm)',border:`2px solid ${post.cat===cat.id?'var(--forest)':'var(--grey-200)'}`,
+                      background:post.cat===cat.id?'rgba(45,90,61,0.06)':'var(--cream)',display:'flex',alignItems:'center',gap:8,transition:'all 0.2s',minHeight:48
+                    }}>
+                      <span style={{color:post.cat===cat.id?'var(--forest)':'var(--grey-400)'}}>{catIcon(cat.id, post.cat===cat.id?'var(--forest)':'var(--grey-400)')}</span>
+                      <span style={{fontSize:13,fontWeight:600,color:post.cat===cat.id?'var(--forest)':'var(--grey-500)'}}>{cat.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:10,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Urgency</label>
+                <div style={{display:'flex',background:'var(--grey-100)',borderRadius:'var(--radius-sm)',padding:3}}>
+                  <button onClick={() => setPost({...post,urgent:false})} style={{flex:1,padding:'10px',borderRadius:6,fontSize:13,fontWeight:600,background:!post.urgent?'var(--cream)':'transparent',color:!post.urgent?'var(--slate-dark)':'var(--grey-400)',boxShadow:!post.urgent?'var(--shadow-sm)':'none',transition:'all 0.2s',minHeight:44}}>Normal</button>
+                  <button onClick={() => setPost({...post,urgent:true})} style={{flex:1,padding:'10px',borderRadius:6,fontSize:13,fontWeight:600,background:post.urgent?'var(--ember)':'transparent',color:post.urgent?'white':'var(--grey-400)',transition:'all 0.2s',display:'flex',alignItems:'center',justifyContent:'center',gap:4,minHeight:44}}>{I.bolt} Urgent</button>
+                </div>
+              </>)}
+
+              {postStep === 2 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>Details</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>Add more information about the job.</p>
+                <div style={{display:'flex',flexDirection:'column',gap:16}}>
+                  <div>
+                    <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Description</label>
+                    <textarea style={{...S.input,minHeight:100,resize:'none'}} placeholder="Describe in detail what you need done..." maxLength={500} value={post.desc} onChange={e => setPost({...post,desc:e.target.value})} />
+                    <div style={{fontSize:11,color:'var(--grey-400)',textAlign:'right',marginTop:4}}>{post.desc.length} / 500</div>
+                  </div>
+                  <div>
+                    <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Location</label>
+                    <input style={S.input} placeholder="Address or area" value={post.loc} onChange={e => setPost({...post,loc:e.target.value})} />
+                    <button style={{fontSize:12,color:'var(--forest)',fontWeight:700,marginTop:6,background:'none',display:'flex',alignItems:'center',gap:4,minHeight:44}}>{I.mapPin} Use my location</button>
+                  </div>
+                  <div>
+                    <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Date</label>
+                    <div style={{display:'flex',gap:8,overflowX:'auto',paddingBottom:4}}>
+                      {dates.map(d => (
+                        <button key={d.full} onClick={() => setPost({...post,date:d.full})} style={{
+                          display:'flex',flexDirection:'column',alignItems:'center',padding:'10px 12px',borderRadius:8,minWidth:48,minHeight:56,
+                          background:post.date===d.full?'var(--forest)':'var(--cream)',color:post.date===d.full?'white':'var(--text)',
+                          border:`1.5px solid ${post.date===d.full?'var(--forest)':'var(--grey-200)'}`,flexShrink:0,transition:'all 0.2s'
+                        }}>
+                          <span style={{fontSize:10,fontWeight:600,opacity:0.7}}>{d.wd}</span>
+                          <span style={{fontSize:16,fontWeight:700}}>{d.day}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Duration</label>
+                    <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                      {['Half day','1 day','2-3 days','~1 week','Flexible'].map(d => (
+                        <button key={d} onClick={() => setPost({...post,duration:d})} style={{
+                          ...S.chip, border:`1.5px solid ${post.duration===d?'var(--forest)':'var(--grey-200)'}`,
+                          background:post.duration===d?'rgba(45,90,61,0.06)':'var(--cream)',
+                          color:post.duration===d?'var(--forest)':'var(--grey-500)',fontSize:12,fontWeight:600,minHeight:40
+                        }}>{d}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Budget ($)</label>
+                    <input style={S.input} placeholder="e.g. 500" type="text" value={post.budget} onChange={e => setPost({...post,budget:e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Workers needed</label>
+                    <div style={{display:'flex',alignItems:'center',gap:16}}>
+                      <button onClick={() => setPost({...post,workers:Math.max(1,post.workers-1)})} style={{width:48,height:48,borderRadius:8,border:'1.5px solid var(--grey-200)',background:'var(--cream)',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700}}>-</button>
+                      <span style={{fontSize:20,fontWeight:800,color:'var(--slate-dark)',minWidth:24,textAlign:'center'}}>{post.workers}</span>
+                      <button onClick={() => setPost({...post,workers:Math.min(10,post.workers+1)})} style={{width:48,height:48,borderRadius:8,border:'1.5px solid var(--grey-200)',background:'var(--cream)',fontSize:18,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700}}>+</button>
+                    </div>
+                  </div>
+                </div>
+              </>)}
+
+              {postStep === 3 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>Review and Publish</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>Review the details and publish your job.</p>
+                <div style={{background:'var(--cream)',borderRadius:'var(--radius)',padding:16,border:'1px solid var(--grey-200)',marginBottom:16,borderLeft:`4px solid var(--forest)`}}>
+                  <h4 style={{fontFamily:'var(--font-display)',fontSize:16,color:'var(--slate-dark)',marginBottom:8,fontWeight:700}}>{post.title || 'Job title'}</h4>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:8,fontSize:12,color:'var(--grey-500)'}}>
+                    {post.cat && <span style={{display:'flex',alignItems:'center',gap:3}}>{CATEGORIES.find(c=>c.id===post.cat)?.label}</span>}
+                    {post.loc && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.mapPin} {post.loc}</span>}
+                    {post.duration && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.clock} {post.duration}</span>}
+                    {post.budget && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.dollar} ${post.budget}</span>}
+                    <span>{post.workers} worker{post.workers>1?'s':''}</span>
+                    {post.urgent && <span style={{color:'var(--ember)',fontWeight:700,display:'flex',alignItems:'center',gap:3}}>{I.bolt} Urgent</span>}
+                  </div>
+                  {post.desc && <p style={{fontSize:13,color:'var(--text-muted)',marginTop:10,lineHeight:1.4}}>{post.desc}</p>}
+                </div>
+                <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:10,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Photos (optional)</label>
+                <div style={{display:'flex',gap:10,marginBottom:20}}>
+                  {[1,2,3].map(i => (
+                    <button key={i} style={{width:90,height:90,borderRadius:'var(--radius-sm)',border:'2px dashed var(--grey-300)',background:'var(--grey-100)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      {I.camera}
+                    </button>
+                  ))}
+                </div>
+              </>)}
+            </div>
+          </div>
+        ) : (
+          <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',animation:'scaleIn 0.4s ease'}}>
+            <div style={{textAlign:'center',padding:24}}>
+              <div style={{width:80,height:80,borderRadius:'50%',background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h2 style={{fontFamily:'var(--font-display)',fontSize:26,color:'var(--slate-dark)',marginBottom:8,fontWeight:700}}>Your job is live!</h2>
+              <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:24}}>You'll get notifications when someone applies.</p>
+              <button onClick={() => {closePost();setTab('jobs');}} style={{...S.btn,...S.btnForest,width:'100%'}}>View My Jobs</button>
+            </div>
+          </div>
+        )}
+        {!postDone && (
+          <div style={{padding:'12px 20px',paddingBottom:'max(var(--safe-bottom), 16px)',background:'var(--cream)',borderTop:'1px solid var(--grey-200)',display:'flex',gap:10}}>
+            {postStep > 1 && <button onClick={() => setPostStep(postStep-1)} style={{...S.btn,...S.btnOutline,flex:1}}>Back</button>}
+            {postStep < 3 ? (
+              <button onClick={() => setPostStep(postStep+1)} style={{...S.btn,...S.btnForest,flex:2}}>Continue</button>
+            ) : (
+              <div style={{display:'flex',gap:10,flex:1}}>
+                <button style={{...S.btn,...S.btnOutline,flex:1,fontSize:13}}>Save Draft</button>
+                <button onClick={() => setPostDone(true)} style={{...S.btn,...S.btnEmber,flex:1,fontSize:13}}>Publish</button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
+     MESSAGES
+     ════════════════════════════════════════════ */
+  const renderMessages = () => {
+    if (selChat) {
+      const conv = CONVERSATIONS.find(c => c.id === selChat);
+      const m = msgs[selChat] || [];
+      const sendMsg = () => {
+        if (chatIn.trim()) {
+          setMsgs(prev => ({...prev,[selChat]:[...(prev[selChat]||[]),{id:Date.now(),from:'me',text:chatIn,time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}]}));
+          setChatIn('');
+        }
+      };
+      return (
+        <div style={{...S.screen,...S.safeTop}}>
+          <div style={{display:'flex',alignItems:'center',padding:'10px 16px',gap:10,background:'var(--cream)',borderBottom:'1px solid var(--grey-200)'}}>
+            <button onClick={() => setSelChat(null)} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.back}</button>
+            <Avatar init={conv.init} size={36} bg='var(--forest)' />
+            <div style={{flex:1}}>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <span style={{fontWeight:700,fontSize:14}}>{conv.name}</span>
+                {conv.online && <div style={{width:8,height:8,borderRadius:4,background:'#2ECC71',animation:'dotPulse 2s infinite'}}/>}
+              </div>
+              <span style={{fontSize:11,color:'var(--grey-400)'}}>{conv.online?'Online':'Offline'}</span>
+            </div>
+          </div>
+          <div style={{background:'rgba(45,90,61,0.05)',padding:'8px 16px',display:'flex',alignItems:'center',gap:8,borderBottom:'1px solid var(--grey-200)'}}>
+            <span style={{display:'flex',alignItems:'center',gap:4,fontSize:12,color:'var(--forest)',fontWeight:600}}>{I.briefcase('var(--forest)')} {conv.jobTitle}</span>
+          </div>
+          <div style={{...S.scroll,padding:'12px 16px',display:'flex',flexDirection:'column',gap:8}}>
+            <div style={{textAlign:'center',padding:'8px 0'}}><span style={{fontSize:11,color:'var(--grey-400)',background:'var(--grey-100)',padding:'4px 12px',borderRadius:10}}>Today</span></div>
+            {m.map((msg,i) => (
+              <div key={msg.id} style={{display:'flex',justifyContent:msg.from==='me'?'flex-end':'flex-start',animation:`fadeInUp 0.2s ease ${i*0.03}s both`}}>
+                <div style={{
+                  maxWidth:'75%',padding:'10px 14px',fontSize:14,lineHeight:1.4,
+                  borderRadius:msg.from==='me'?'12px 12px 4px 12px':'12px 12px 12px 4px',
+                  ...(msg.from==='me' ? {background:'var(--forest)',color:'white'} : {background:'var(--cream)',color:'var(--text)',border:'1px solid var(--grey-200)'}),
+                }}>
+                  <p>{msg.text}</p>
+                  <div style={{fontSize:10,marginTop:4,opacity:0.6,textAlign:'right'}}>{msg.time}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{padding:'10px 16px',paddingBottom:'max(var(--safe-bottom), 12px)',background:'var(--cream)',borderTop:'1px solid var(--grey-200)',display:'flex',gap:10,alignItems:'flex-end'}}>
+            <input value={chatIn} onChange={e => setChatIn(e.target.value)} placeholder="Type a message..." style={{...S.input,borderRadius:20,padding:'10px 16px',flex:1}}
+              onKeyDown={e => { if(e.key==='Enter') sendMsg(); }}
+            />
+            <button onClick={sendMsg} style={{width:48,height:48,borderRadius:'50%',background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              {I.send}
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div style={S.screen}>
+        <div style={{...S.safeTop,background:'var(--sand)'}}>
+          <div style={{padding:'16px 20px 12px'}}>
+            <h1 style={{fontFamily:'var(--font-display)',fontSize:24,color:'var(--slate-dark)',fontWeight:700}}>Messages</h1>
+          </div>
+        </div>
+        <div style={S.scroll}>
+          <div style={{padding:'4px 0 100px'}}>
+            {CONVERSATIONS.map((conv,i) => (
+              <button key={conv.id} onClick={() => setSelChat(conv.id)} style={{
+                display:'flex',alignItems:'center',gap:12,padding:'14px 20px',width:'100%',background:'var(--cream)',
+                borderBottom:'1px solid var(--grey-100)',textAlign:'left',animation:`fadeInUp 0.3s ease ${i*0.06}s both`,minHeight:72
+              }}>
+                <div style={{position:'relative'}}>
+                  <Avatar init={conv.init} size={48} bg='var(--forest)' />
+                  {conv.online && <div style={{position:'absolute',bottom:1,right:1,width:12,height:12,borderRadius:6,background:'#2ECC71',border:'2px solid var(--cream)'}}/>}
+                </div>
+                <div style={{flex:1,overflow:'hidden'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:2}}>
+                    <span style={{fontWeight:700,fontSize:15}}>{conv.name}</span>
+                    <span style={{fontSize:11,color:'var(--grey-400)'}}>{conv.time}</span>
+                  </div>
+                  <div style={{fontSize:11,color:'var(--forest)',fontWeight:600,marginBottom:2,display:'flex',alignItems:'center',gap:3}}>{I.briefcase('var(--forest)')} {conv.jobTitle}</div>
+                  <p style={{fontSize:13,color:'var(--text-muted)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{conv.lastMsg}</p>
+                </div>
+                {conv.unread > 0 && <div style={S.badge}>{conv.unread}</div>}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
+     PROFILE
+     ════════════════════════════════════════════ */
+  const renderProfile = () => (
+    <div style={S.screen}>
+      <div style={S.safeTop}>
+        <div style={{background:'linear-gradient(135deg, var(--slate-dark), var(--forest))',padding:'24px 20px 20px',borderRadius:'0 0 16px 16px'}}>
+          <div style={{display:'flex',alignItems:'center',gap:14}}>
+            <div style={{width:60,height:60,borderRadius:'50%',background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',border:'3px solid rgba(255,255,255,0.2)'}}>
+              <span style={{fontSize:22,fontWeight:800,color:'white'}}>JR</span>
+            </div>
+            <div>
+              <h2 style={{color:'white',fontSize:18,fontWeight:800}}>Jordan Reed</h2>
+              <p style={{color:'rgba(255,255,255,0.6)',fontSize:13}}>jordan.reed@email.com</p>
+              <span style={{fontSize:11,color:'var(--sage-light)',fontWeight:700,display:'flex',alignItems:'center',gap:3}}>{I.shield} Verified</span>
+            </div>
+          </div>
+          <div style={{display:'flex',gap:10,marginTop:18}}>
+            {[{n:'5',l:'Jobs Posted'},{n:'3',l:'Applications'},{n:'4.8',l:'Rating'}].map((stat,i) => (
+              <div key={i} style={{flex:1,background:'rgba(255,255,255,0.08)',borderRadius:8,padding:'10px 8px',textAlign:'center'}}>
+                <div style={{color:'white',fontSize:18,fontWeight:800}}>{stat.n}</div>
+                <div style={{color:'rgba(255,255,255,0.5)',fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:0.3}}>{stat.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div style={S.scroll}>
+        <div style={{padding:'16px 20px 100px'}}>
+          <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',marginBottom:12,fontWeight:700}}>My Applications</h3>
+          <div style={{display:'flex',gap:8,marginBottom:12}}>
+            {[{id:'pending',label:'Pending'},{id:'accepted',label:'Accepted'},{id:'declined',label:'Declined'}].map(t => (
+              <button key={t.id} onClick={() => setAppTab(t.id)} style={{
+                ...S.chip,fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,
+                background:appTab===t.id?'var(--forest)':'var(--cream)',
+                color:appTab===t.id?'white':'var(--grey-500)',
+                border:appTab===t.id?'none':'1px solid var(--grey-200)'
+              }}>{t.label}</button>
+            ))}
+          </div>
+          {MY_APPS.filter(a => a.status===appTab).map((app,i) => (
+            <div key={app.id} style={{
+              ...S.card, margin:'0 0 10px',
+              ...(app.status==='accepted' ? {borderLeft:'4px solid var(--forest)'} : app.status==='declined' ? {borderLeft:'4px solid #C0392B'} : {}),
+              animation:`fadeInUp 0.3s ease ${i*0.06}s both`
+            }}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
+                <div>
+                  <h4 style={{fontFamily:'var(--font-display)',fontSize:15,color:'var(--slate-dark)',fontWeight:600}}>{app.jobTitle}</h4>
+                  <span style={{fontSize:12,color:'var(--text-muted)'}}>by {app.poster}</span>
+                </div>
+                <span style={{fontSize:13,fontWeight:800,color:'var(--forest)'}}>{app.price}</span>
+              </div>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                <span style={{fontSize:11,fontWeight:700,padding:'3px 10px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5,
+                  ...(app.status==='pending' ? {background:'rgba(212,160,48,0.1)',color:'#D4A030'} :
+                     app.status==='accepted' ? {background:'rgba(45,90,61,0.1)',color:'var(--forest)'} :
+                     {background:'rgba(192,57,43,0.1)',color:'#C0392B'})
+                }}>{app.status==='pending'?'Pending':app.status==='accepted'?'Accepted':'Declined'}</span>
+                <span style={{fontSize:11,color:'var(--grey-400)'}}>{app.time}</span>
+              </div>
+              {app.status === 'accepted' && (
+                <button onClick={() => {setTab('messages');setSelChat(1);}} style={{...S.btn,...S.btnForest,marginTop:10,padding:'10px 16px',fontSize:13,width:'100%'}}>Continue Conversation</button>
+              )}
+            </div>
+          ))}
+
+          <div style={{marginTop:24}}>
+            {[
+              {icon:I.briefcase('var(--grey-500)'),label:'My Jobs',action:() => setTab('jobs')},
+              {icon:I.fileText,label:'My Applications'},
+              {icon:I.bookmark,label:'Saved Jobs'},
+              {icon:I.star(20),label:'My Reviews'},
+              {icon:I.bell,label:'Notifications'},
+              {icon:I.settings,label:'Account Settings'},
+              {icon:I.helpCircle,label:'Help Center'},
+            ].map((item,i) => (
+              <button key={i} onClick={item.action} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 0',width:'100%',background:'none',borderBottom:'1px solid var(--grey-200)',textAlign:'left',minHeight:48,color:'var(--grey-500)'}}>
+                <span style={{display:'flex',alignItems:'center'}}>{item.icon}</span>
+                <span style={{fontSize:14,fontWeight:500,color:'var(--text)',flex:1}}>{item.label}</span>
+                {I.chevRight}
+              </button>
+            ))}
+            <button onClick={() => setLoggedIn(false)} style={{display:'flex',alignItems:'center',gap:12,padding:'14px 0',width:'100%',background:'none',textAlign:'left',minHeight:48}}>
+              <span style={{display:'flex',alignItems:'center'}}>{I.logOut}</span>
+              <span style={{fontSize:14,fontWeight:700,color:'#C0392B'}}>Log Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ════════════════════════════════════════════
+     BOTTOM NAV
+     ════════════════════════════════════════════ */
+  const totalUnread = CONVERSATIONS.reduce((s,c) => s+c.unread, 0);
+  const renderNav = () => (
+    <div style={S.nav}>
+      {[
+        {id:'home', icon:I.home, label:'Home'},
+        {id:'jobs', icon:I.briefcase, label:'Jobs'},
+        {id:'post', icon:null, label:'Post'},
+        {id:'messages', icon:I.chat, label:'Messages', badge:totalUnread},
+        {id:'profile', icon:I.user, label:'Profile'},
+      ].map(t => t.id === 'post' ? (
+        <button key="post" onClick={() => {setShowPost(true);setPostStep(1);setPostDone(false);}} style={{
+          width:56,height:56,borderRadius:'50%',background:'var(--ember)',display:'flex',alignItems:'center',justifyContent:'center',
+          boxShadow:'0 4px 16px rgba(212,87,42,0.35)',marginTop:-20,border:'4px solid var(--sand)',position:'relative',zIndex:5
+        }}>
+          {I.plus}
+        </button>
+      ) : (
+        <button key={t.id} onClick={() => {setTab(t.id);setSelJob(null);setSelMyJob(null);setSelChat(null);}} style={{
+          display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',padding:'6px 10px',minWidth:56,minHeight:48,position:'relative',justifyContent:'center'
+        }}>
+          <div style={{position:'relative'}}>
+            {t.icon(tab===t.id?'var(--forest)':'var(--grey-400)')}
+            {t.badge > 0 && <div style={{...S.badge,position:'absolute',top:-4,right:-8,animation:'pulse 2s infinite'}}>{t.badge}</div>}
+          </div>
+          <span style={{fontSize:10,fontWeight:700,color:tab===t.id?'var(--forest)':'var(--grey-400)',textTransform:'uppercase',letterSpacing:0.3}}>{t.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+
+  /* ════════════════════════════════════════════
+     MAIN RENDER
+     ════════════════════════════════════════════ */
+  if (!loggedIn) return renderAuth();
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'var(--sand)'}}>
+      <div style={{flex:1,overflow:'hidden',position:'relative'}}>
+        {selJob && renderJobDetail()}
+        {selMyJob && renderMyJobDetail()}
+        {!selJob && !selMyJob && tab === 'home' && renderHome()}
+        {!selJob && !selMyJob && tab === 'jobs' && renderMyJobs()}
+        {!selJob && !selMyJob && tab === 'messages' && renderMessages()}
+        {!selJob && !selMyJob && tab === 'profile' && renderProfile()}
+      </div>
+      {!selJob && !selMyJob && !selChat && renderNav()}
+      {showPost && renderPostJob()}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

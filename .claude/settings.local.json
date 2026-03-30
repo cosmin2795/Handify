@@ -31,7 +31,17 @@
       "Bash(git add gradle/libs.versions.toml shared/src/commonMain/kotlin/com/example/handify/data/remote/api/AuthApi.kt server/src/main/kotlin/com/example/handify/features/auth/api/AuthRoutes.kt shared/build.gradle.kts shared/src/commonMain/kotlin/com/example/handify/core/di/SharedModule.kt composeApp/src/androidMain/kotlin/com/example/handify/di/AppModule.kt .claude/launch.json .claude/settings.json)",
       "Bash(git commit:*)",
       "Bash(git push)",
-      "Bash(git add .claude/settings.local.json)"
+      "Bash(git add .claude/settings.local.json)",
+      "Bash(find /Users/ancaroman/AndroidStudioProjects/Handify -name \"*ViewModel.kt\" -o -name \"*State.kt\" 2>/dev/null | head -20)",
+      "Bash(find /Users/ancaroman/AndroidStudioProjects/Handify/shared/src/commonMain/kotlin/com/example/handify -type f -name \"*.kt\" 2>/dev/null | sort)",
+      "Bash(find /Users/ancaroman/AndroidStudioProjects/Handify/composeApp/src/androidMain/kotlin/com/example/handify -type f -name \"*.kt\" 2>/dev/null | sort)",
+      "Bash(find /Users/ancaroman/AndroidStudioProjects/Handify -path \"*/server/src/main/kotlin/com/example/handify*\" -name \"*.kt\" 2>/dev/null | head -30)",
+      "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -60)",
+      "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -40)",
+      "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -30)",
+      "Bash(./gradlew :server:compileKotlin 2>&1 | tail -30)",
+      "Bash(./gradlew :server:compileKotlin 2>&1 | tail -10)",
+      "Bash(./gradlew :composeApp:compileDebugKotlin 2>&1 | tail -15)"
     ]
   }
 }

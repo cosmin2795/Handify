@@ -5,11 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm
 import java.util.Date
 
 object JwtConfig {
-    // TODO: Move these to environment variables or application.conf
-    private const val SECRET = "handify-jwt-secret-change-in-production"
+    private val SECRET = System.getenv("JWT_SECRET") ?: "handify-jwt-secret-change-in-production"
     const val ISSUER = "handify"
     const val AUDIENCE = "handify-users"
-    private const val VALIDITY_MS = 86_400_000L // 24 hours
+    private const val VALIDITY_MS = 86_400_000L
 
     val algorithm: Algorithm = Algorithm.HMAC256(SECRET)
 

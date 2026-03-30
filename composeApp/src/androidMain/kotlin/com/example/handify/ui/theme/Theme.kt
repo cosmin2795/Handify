@@ -6,12 +6,12 @@ import androidx.compose.runtime.Composable
 
 private val HandifyColorScheme = lightColorScheme(
     primary = HandifyPrimary,
-    secondary = HandifySecondary,
     background = HandifyBackground,
     surface = HandifySurface,
     onPrimary = HandifyOnPrimary,
     onBackground = HandifyOnBackground,
-    onSurface = HandifyOnSurface
+    onSurface = HandifyOnSurface,
+    error = Ember
 )
 
 @Composable
