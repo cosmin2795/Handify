@@ -21,11 +21,18 @@ import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
-fun JobCard(job: Job, onClick: () -> Unit) {
+fun JobCard(job: Job, onClick: () -> Unit, userLat: Double? = null, userLng: Double? = null) {
     val catColor = CategoryColors[job.category.name] ?: Forest
     val catLabel = job.category.name.lowercase().replaceFirstChar { it.uppercase() }
     val budgetText = formatBudget(job.budgetMin, job.budgetMax)
     val isNew = System.currentTimeMillis() - job.createdAt < 86_400_000L
+    val distanceText = run {
+        val jLat = job.lat; val jLng = job.lng
+        val uLat = userLat; val uLng = userLng
+        if (jLat != null && jLng != null && uLat != null && uLng != null)
+            formatDistance(haversineKm(uLat, uLng, jLat, jLng))
+        else null
+    }
 
     Row(
         modifier = Modifier
@@ -54,6 +61,9 @@ fun JobCard(job: Job, onClick: () -> Unit) {
                 }
                 if (job.isUrgent) {
                     TagChip(label = "Urgent", textColor = Color.White, bgColor = Ember)
+                }
+                if (distanceText != null) {
+                    TagChip(label = distanceText, textColor = Forest, bgColor = Forest.copy(alpha = 0.1f))
                 }
             }
 
@@ -196,3 +206,16 @@ private fun formatBudget(min: Double, max: Double): String {
 
 private fun String.toInitials(): String =
     trim().split(" ").filter { it.isNotEmpty() }.take(2).joinToString("") { it.first().uppercase() }
+
+private fun haversineKm(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+    val r = 6371.0
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLng = Math.toRadians(lng2 - lng1)
+    val a = Math.sin(dLat / 2).let { it * it } +
+            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+            Math.sin(dLng / 2).let { it * it }
+    return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+private fun formatDistance(km: Double): String =
+    if (km < 1.0) "${(km * 1000).toInt()} m" else "${"%.1f".format(km)} km"

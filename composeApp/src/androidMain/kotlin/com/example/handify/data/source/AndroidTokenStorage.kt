@@ -12,4 +12,8 @@ class AndroidTokenStorage(context: Context) : TokenStorage {
     }
 
     override fun get(): String? = prefs.getString("auth_token", null)
+
+    override fun clear() {
+        prefs.edit().remove("auth_token").apply()
+    }
 }

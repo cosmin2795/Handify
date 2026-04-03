@@ -15,6 +15,8 @@ data class Job(
     val clientName: String,
     val clientRating: Double,
     val applicantsCount: Int,
+    val lat: Double?,
+    val lng: Double?,
     val createdAt: Long
 )
 

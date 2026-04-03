@@ -1,5 +1,8 @@
 package com.example.handify.ui.screen
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.handify.R
 import com.example.handify.domain.model.Job
+import com.example.handify.domain.model.SavedAddress
 import com.example.handify.presentation.job.JobListState
+import com.example.handify.presentation.location.LocationState
 import com.example.handify.ui.component.JobCard
 import com.example.handify.ui.theme.*
 
@@ -43,20 +49,48 @@ private val SORTS = listOf(
     "near" to "Nearby"
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     state: JobListState,
+    locationState: LocationState,
     onJobClick: (Job) -> Unit,
     onCategorySelect: (String) -> Unit,
     onSortSelect: (String) -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onLoadUserLocation: () -> Unit = {},
+    onLocationPillClick: () -> Unit = {},
+    onLocationSelect: (String) -> Unit = {},
+    onLocationDismiss: () -> Unit = {},
+    onLocationRemove: (String) -> Unit = {},
+    onLocationSearch: (String) -> Unit = {},
+    onOpenAddForm: () -> Unit = {},
+    onCloseAddForm: () -> Unit = {},
+    onNewAddressTextChange: (String) -> Unit = {},
+    onNewAddressLabelChange: (String) -> Unit = {},
+    onSaveAddress: () -> Unit = {}
 ) {
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grants ->
+        if (grants[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            grants[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
+            onLoadUserLocation()
+        }
+    }
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Sand)
     ) {
-        TopBar()
+        TopBar(displayCity = locationState.displayCity, onLocationPillClick = onLocationPillClick)
         SearchBar()
         CategoryFilterRow(selected = state.selectedCategory, onSelect = onCategorySelect)
         SortRow(selected = state.selectedSort, onSelect = onSortSelect)
@@ -98,50 +132,219 @@ fun HomeScreen(
                     contentPadding = PaddingValues(top = 8.dp, bottom = 100.dp)
                 ) {
                     items(state.filteredJobs, key = { it.id }) { job ->
-                        JobCard(job = job, onClick = { onJobClick(job) })
+                        JobCard(
+                            job = job,
+                            onClick = { onJobClick(job) },
+                            userLat = state.userLat,
+                            userLng = state.userLng
+                        )
                     }
                 }
+            }
+        }
+    }
+
+    if (locationState.showModal) {
+        ModalBottomSheet(
+            onDismissRequest = onLocationDismiss,
+            containerColor = Sand,
+            shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+        ) {
+            if (locationState.showAddForm) {
+                AddressForm(
+                    state = locationState,
+                    onTextChange = onNewAddressTextChange,
+                    onLabelChange = onNewAddressLabelChange,
+                    onSave = onSaveAddress,
+                    onCancel = onCloseAddForm
+                )
+            } else {
+                LocationSheetContent(
+                    locationState = locationState,
+                    onSearch = onLocationSearch,
+                    onSelect = onLocationSelect,
+                    onRemove = onLocationRemove,
+                    onAddNew = onOpenAddForm
+                )
             }
         }
     }
 }
 
 @Composable
-private fun TopBar() {
-    Row(
+private fun TopBar(displayCity: String, onLocationPillClick: () -> Unit) {
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        contentAlignment = Alignment.Center
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(R.drawable.ic_location),
-                contentDescription = null,
-                tint = Forest,
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "New York",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = SlateDark
-            )
-        }
         Text(
             text = "Handify",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = SlateDark
         )
-        Icon(
-            painter = painterResource(R.drawable.ic_bell),
-            contentDescription = "Notifications",
-            tint = Slate,
-            modifier = Modifier.size(24.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Grey100)
+                    .clickable { onLocationPillClick() }
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_location),
+                    contentDescription = null,
+                    tint = Forest,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = displayCity,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = SlateDark
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    painter = painterResource(R.drawable.ic_chevron_right),
+                    contentDescription = null,
+                    tint = Grey400,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.ic_bell),
+                contentDescription = "Notifications",
+                tint = Slate,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun LocationSheetContent(
+    locationState: LocationState,
+    onSearch: (String) -> Unit,
+    onSelect: (String) -> Unit,
+    onRemove: (String) -> Unit,
+    onAddNew: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Your Location",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = SlateDark,
+            modifier = Modifier.padding(horizontal = 20.dp)
         )
+        Spacer(modifier = Modifier.height(12.dp))
+        OutlinedTextField(
+            value = locationState.searchQuery,
+            onValueChange = onSearch,
+            placeholder = { Text("Search city or address...", color = Grey400) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            shape = RoundedCornerShape(8.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Forest,
+                unfocusedBorderColor = Grey200,
+                focusedContainerColor = Cream,
+                unfocusedContainerColor = Cream
+            ),
+            singleLine = true,
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_search),
+                    contentDescription = null,
+                    tint = Grey400,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        locationState.filteredAddresses.forEach { address ->
+            SheetAddressRow(
+                address = address,
+                isActive = address.id == locationState.activeAddressId,
+                onSelect = { onSelect(address.id) },
+                onRemove = { onRemove(address.id) }
+            )
+        }
+        TextButton(
+            onClick = onAddNew,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = "+ Add new address",
+                color = Forest,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun SheetAddressRow(
+    address: SavedAddress,
+    isActive: Boolean,
+    onSelect: () -> Unit,
+    onRemove: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onSelect() }
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_location),
+            contentDescription = null,
+            tint = Forest,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = address.label,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = SlateDark
+            )
+            Text(
+                text = address.fullAddress,
+                fontSize = 12.sp,
+                color = Grey500
+            )
+        }
+        if (isActive) {
+            Icon(
+                painter = painterResource(R.drawable.ic_check),
+                contentDescription = "Active",
+                tint = Forest,
+                modifier = Modifier.size(18.dp)
+            )
+        } else {
+            IconButton(onClick = onRemove, modifier = Modifier.size(36.dp)) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_trash),
+                    contentDescription = "Remove",
+                    tint = Grey400,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
     }
 }
 

@@ -3,4 +3,7 @@
 
     <!-- Google Sign-In: Web Client ID from Google Cloud Console -->
     <string name="google_web_client_id">1073015842574-j1b8al0e91g3engmg9rtchtlnqemtut7.apps.googleusercontent.com</string>
+
+    <!-- Google Maps API Key -->
+    <string name="google_maps_key">AIzaSyBNhSoCl0TrKFdti968x2-oguzFDR6vobU</string>
 </resources>

@@ -1,9 +1,11 @@
 package com.example.handify.data.remote.api
 
+import com.example.handify.data.remote.request.CreateJobRequest
 import com.example.handify.data.remote.response.JobResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 
 class JobApi(private val client: HttpClient, private val baseUrl: String) {
 
@@ -12,4 +14,10 @@ class JobApi(private val client: HttpClient, private val baseUrl: String) {
 
     suspend fun getMyJobs(): List<JobResponse> =
         client.get("$baseUrl/api/jobs/mine").body()
+
+    suspend fun createJob(req: CreateJobRequest): JobResponse =
+        client.post("$baseUrl/api/jobs") {
+            contentType(ContentType.Application.Json)
+            setBody(req)
+        }.body()
 }

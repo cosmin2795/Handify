@@ -116,6 +116,27 @@ const MY_APPS = [
   { id:3, jobTitle:'Fix leaking faucet + new fixture', poster:'Mike Tanaka', price:'$180', status:'declined', time:'3d ago' },
 ];
 
+const SAVED_ADDRESSES = [
+  { id:'addr_1', label:'Home', fullAddress:'123 Oak Street, Austin, TX' },
+  { id:'addr_2', label:'Work', fullAddress:'456 Commerce Blvd, Austin, TX' },
+];
+
+const CONTRACTOR_SERVICES = [
+  'Constructions & Renovations','Plastering & Rendering','Painting & Decorating','Tiling (floor & wall)','Flooring & Parquet','Drywall & Ceilings','Thermal Insulation','Waterproofing','Demolition & Debris removal',
+  'Plumbing','Boilers & Heating','Sanitary fixtures',
+  'Electrical installations','Electrical panels','Lighting','Smart home & Automation','Solar panels & PV','CCTV & Alarms',
+  'Gas installations','Air conditioning & HVAC','Heat pumps','Ventilation',
+  'Carpentry & Joinery','Furniture assembly','PVC & Aluminium windows','Doors & Windows',
+  'Roofing','Gutters & Downpipes',
+  'Cleaning (residential)','Post-renovation cleaning','Office cleaning','Window cleaning','Chimney cleaning','Disinfection','Pest control',
+  'Clearance & Removals','Old furniture removal','Rubble removal','Basement & attic clearance',
+  'Garden & Landscaping','Hedge & tree trimming','Irrigation systems','Paving & Borders','Snow clearing','Pools & Fountains',
+  'Moving (residential)','Moving (office)','Freight transport','Towing',
+  'Car mechanics','Car body & paint','Car detailing','Car electrics','Tyre service',
+  'Photography','Videography','Event decoration','IT & Computer repair','Phone repair','Networking & CCTV','Software installation',
+  'Elderly care','Babysitting','Pet care','Tutoring','Language lessons',
+];
+
 const CONVERSATIONS = [
   { id:1, name:'Joanna Park', init:'JP', lastMsg:'Perfect, see you Saturday at 10!', time:'10:23 AM', unread:2, jobTitle:'Photographer for christening', online:true },
   { id:2, name:'Dan Cooper', init:'DC', lastMsg:'Can you come tomorrow morning?', time:'Yesterday', unread:0, jobTitle:'IKEA furniture assembly', online:false },
@@ -182,6 +203,8 @@ const I = {
   settings: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
   helpCircle: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
   logOut: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C0392B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+  trash: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>,
+  locationPin: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>,
   bell: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--slate)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>,
   fileText: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
   bookmark: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>,
@@ -236,6 +259,48 @@ function App() {
 
   const [appTab, setAppTab] = useState('pending');
 
+  const [addresses, setAddresses] = useState(SAVED_ADDRESSES);
+  const [activeAddrId, setActiveAddrId] = useState('addr_1');
+  const [showLocModal, setShowLocModal] = useState(false);
+  const [locSearch, setLocSearch] = useState('');
+  const [showAddrForm, setShowAddrForm] = useState(false);
+  const [newAddrText, setNewAddrText] = useState('');
+  const [newAddrLabel, setNewAddrLabel] = useState('Home');
+  const [editingAddrId, setEditingAddrId] = useState(null);
+  const [showAddressesScreen, setShowAddressesScreen] = useState(false);
+
+  const [showRoleSheet, setShowRoleSheet] = useState(false);
+  const [contractorProfile, setContractorProfile] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('handify_contractor_profile') || 'null'); } catch { return null; }
+  });
+  const [showContractorWizard, setShowContractorWizard] = useState(false);
+  const [wizardStep, setWizardStep] = useState(1);
+  const [wizardDone, setWizardDone] = useState(false);
+  const [wizardData, setWizardData] = useState({
+    categories: [], title: '', experience: '', workType: 'solo', certified: false, certText: '',
+    city: '', radius: '', availability: '', rateType: '', rate: '', bio: '', photos: [null,null,null],
+  });
+
+  const displayCity = addresses.find(a=>a.id===activeAddrId)?.fullAddress?.split(',')[0]?.trim() || 'Location';
+
+  const saveAddress = () => {
+    if (!newAddrText.trim()) return;
+    if (editingAddrId) {
+      setAddresses(prev => prev.map(a => a.id===editingAddrId ? {...a, label:newAddrLabel, fullAddress:newAddrText} : a));
+    } else {
+      const id = 'addr_' + Date.now();
+      setAddresses(prev => [...prev, {id, label:newAddrLabel, fullAddress:newAddrText}]);
+    }
+    setShowAddrForm(false); setNewAddrText(''); setNewAddrLabel('Home'); setEditingAddrId(null);
+  };
+
+  const openAddForm = (addr=null) => {
+    setEditingAddrId(addr ? addr.id : null);
+    setNewAddrText(addr ? addr.fullAddress : '');
+    setNewAddrLabel(addr ? addr.label : 'Home');
+    setShowAddrForm(true);
+  };
+
   const otpRefs = useRef([]);
 
   useEffect(() => {
@@ -245,7 +310,17 @@ function App() {
     }
   }, [auth, otpTimer]);
 
-  const doLogin = () => { setLoggedIn(true); setTab('home'); };
+  const doLogin = () => {
+    const seen = localStorage.getItem('handify_role_set');
+    setLoggedIn(true); setTab('home');
+    if (!seen) setShowRoleSheet(true);
+  };
+
+  const openContractorWizard = () => {
+    setWizardStep(1); setWizardDone(false);
+    setWizardData({categories:[],title:'',experience:'',workType:'solo',certified:false,certText:'',city:'',radius:'',availability:'',rateType:'',rate:'',bio:'',photos:[null,null,null]});
+    setShowContractorWizard(true);
+  };
 
   /* ──── STYLES ──── */
   const S = {
@@ -454,14 +529,127 @@ function App() {
   };
 
   /* ════════════════════════════════════════════
+     LOCATION MODAL
+     ════════════════════════════════════════════ */
+  const renderAddressFormContent = (onCancel) => {
+    const filtered = addresses.filter(a =>
+      !locSearch || a.fullAddress.toLowerCase().includes(locSearch.toLowerCase()) || a.label.toLowerCase().includes(locSearch.toLowerCase())
+    );
+    return showAddrForm ? (
+      <div style={{padding:'16px 20px 32px',animation:'fadeInUp 0.2s ease'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20}}>
+          <button onClick={() => {setShowAddrForm(false);setNewAddrText('');setNewAddrLabel('Home');setEditingAddrId(null);}} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.back}</button>
+          <h3 style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:700,color:'var(--slate-dark)'}}>{editingAddrId ? 'Edit Address' : 'New Address'}</h3>
+        </div>
+        <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Full Address</label>
+        <input style={{...S.input,marginBottom:16}} placeholder="e.g. 123 Main St, Austin, TX" value={newAddrText} onChange={e => setNewAddrText(e.target.value)} />
+        <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Label</label>
+        <div style={{display:'flex',background:'var(--grey-100)',borderRadius:'var(--radius-sm)',padding:3,marginBottom:24}}>
+          {['Home','Work','Other'].map(lbl => (
+            <button key={lbl} onClick={() => setNewAddrLabel(lbl)} style={{flex:1,padding:'10px',borderRadius:6,fontSize:13,fontWeight:600,background:newAddrLabel===lbl?'var(--cream)':'transparent',color:newAddrLabel===lbl?'var(--slate-dark)':'var(--grey-400)',boxShadow:newAddrLabel===lbl?'var(--shadow-sm)':'none',transition:'all 0.2s',minHeight:44}}>{lbl}</button>
+          ))}
+        </div>
+        <button onClick={saveAddress} style={{...S.btn,...{background:'var(--forest)',color:'white'},width:'100%',marginBottom:8}}>Save Address</button>
+        <button onClick={() => {setShowAddrForm(false);setNewAddrText('');setNewAddrLabel('Home');setEditingAddrId(null);}} style={{...S.btn,background:'transparent',color:'var(--grey-500)',width:'100%'}}>Cancel</button>
+      </div>
+    ) : (
+      <div style={{padding:'0 0 32px'}}>
+        <h3 style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:700,color:'var(--slate-dark)',padding:'16px 20px 12px'}}>Your Location</h3>
+        <div style={{padding:'0 20px 12px'}}>
+          <div style={{display:'flex',alignItems:'center',background:'var(--cream)',borderRadius:'var(--radius-sm)',padding:'10px 14px',border:'1px solid var(--grey-200)',gap:8}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--grey-400)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input placeholder="Search city or address..." value={locSearch} onChange={e => setLocSearch(e.target.value)} style={{border:'none',flex:1,fontSize:14,color:'var(--text)',background:'transparent'}} />
+          </div>
+        </div>
+        {filtered.map(addr => (
+          <div key={addr.id} onClick={() => {setActiveAddrId(addr.id);setShowLocModal(false);setLocSearch('');}} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 20px',cursor:'pointer'}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14,fontWeight:600,color:'var(--slate-dark)'}}>{addr.label}</div>
+              <div style={{fontSize:12,color:'var(--grey-500)'}}>{addr.fullAddress}</div>
+            </div>
+            {addr.id === activeAddrId ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            ) : (
+              <button onClick={e => {e.stopPropagation();setAddresses(prev=>prev.filter(a=>a.id!==addr.id));if(activeAddrId===addr.id)setActiveAddrId(addresses.find(a=>a.id!==addr.id)?.id||null);}} style={{background:'none',padding:4,color:'var(--grey-400)',display:'flex',alignItems:'center',justifyContent:'center',minWidth:36,minHeight:36}}>
+                {I.trash}
+              </button>
+            )}
+          </div>
+        ))}
+        <button onClick={() => openAddForm()} style={{display:'flex',alignItems:'center',gap:4,padding:'12px 20px',background:'none',fontSize:14,fontWeight:600,color:'var(--forest)',minHeight:48}}>+ Add new address</button>
+      </div>
+    );
+  };
+
+  const renderLocationModal = () => (
+    <>
+      <div onClick={() => {setShowLocModal(false);setShowAddrForm(false);setLocSearch('');setNewAddrText('');setNewAddrLabel('Home');setEditingAddrId(null);}} style={S.overlay} />
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:210,background:'var(--sand)',borderRadius:'16px 16px 0 0',maxHeight:'80%',overflowY:'auto',animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)'}}>
+        <div style={{width:36,height:4,borderRadius:2,background:'var(--grey-300)',margin:'10px auto 4px'}} />
+        {renderAddressFormContent(() => {setShowLocModal(false);setLocSearch('');})}
+      </div>
+    </>
+  );
+
+  /* ════════════════════════════════════════════
+     ADDRESSES SCREEN
+     ════════════════════════════════════════════ */
+  const renderAddressesScreen = () => (
+    <div style={{...S.modal,...S.safeTop}}>
+      <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,background:'var(--sand)'}}>
+        <button onClick={() => {setShowAddressesScreen(false);setShowAddrForm(false);setNewAddrText('');setNewAddrLabel('Home');setEditingAddrId(null);}} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.back}</button>
+        <h2 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',flex:1,fontWeight:700}}>Saved Addresses</h2>
+      </div>
+      <div style={S.scroll}>
+        {showAddrForm ? (
+          <div style={{padding:'16px 20px 100px',animation:'fadeInUp 0.2s ease'}}>
+            <h3 style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:700,color:'var(--slate-dark)',marginBottom:16}}>{editingAddrId ? 'Edit Address' : 'New Address'}</h3>
+            <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Full Address</label>
+            <input style={{...S.input,marginBottom:16}} placeholder="e.g. 123 Main St, Austin, TX" value={newAddrText} onChange={e => setNewAddrText(e.target.value)} />
+            <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Label</label>
+            <div style={{display:'flex',background:'var(--grey-100)',borderRadius:'var(--radius-sm)',padding:3,marginBottom:24}}>
+              {['Home','Work','Other'].map(lbl => (
+                <button key={lbl} onClick={() => setNewAddrLabel(lbl)} style={{flex:1,padding:'10px',borderRadius:6,fontSize:13,fontWeight:600,background:newAddrLabel===lbl?'var(--cream)':'transparent',color:newAddrLabel===lbl?'var(--slate-dark)':'var(--grey-400)',boxShadow:newAddrLabel===lbl?'var(--shadow-sm)':'none',transition:'all 0.2s',minHeight:44}}>{lbl}</button>
+              ))}
+            </div>
+            <button onClick={saveAddress} style={{...S.btn,...{background:'var(--forest)',color:'white'},width:'100%',marginBottom:8}}>Save Address</button>
+            <button onClick={() => {setShowAddrForm(false);setNewAddrText('');setNewAddrLabel('Home');setEditingAddrId(null);}} style={{...S.btn,background:'transparent',color:'var(--grey-500)',width:'100%'}}>Cancel</button>
+          </div>
+        ) : (
+          <div style={{padding:'12px 0 100px'}}>
+            {addresses.map((addr,i) => (
+              <div key={addr.id} style={{display:'flex',alignItems:'center',gap:12,margin:'0 16px 8px',background:'var(--cream)',borderRadius:'var(--radius)',padding:'14px 16px',border:'1px solid var(--grey-200)',animation:`fadeInUp 0.3s ease ${i*0.05}s both`,cursor:'pointer'}} onClick={() => setActiveAddrId(addr.id)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div style={{flex:1}} onClick={e => {e.stopPropagation();openAddForm(addr);}}>
+                  <div style={{fontSize:14,fontWeight:600,color:'var(--slate-dark)'}}>{addr.label}</div>
+                  <div style={{fontSize:12,color:'var(--grey-500)',marginTop:2}}>{addr.fullAddress}</div>
+                </div>
+                {addr.id === activeAddrId ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                ) : (
+                  <button onClick={e => {e.stopPropagation();setAddresses(prev=>prev.filter(a=>a.id!==addr.id));if(activeAddrId===addr.id)setActiveAddrId(addresses.find(a=>a.id!==addr.id)?.id||null);}} style={{background:'none',padding:4,color:'var(--grey-400)',display:'flex',alignItems:'center',justifyContent:'center',minWidth:36,minHeight:36}}>
+                    {I.trash}
+                  </button>
+                )}
+              </div>
+            ))}
+            <button onClick={() => openAddForm()} style={{display:'flex',alignItems:'center',gap:4,padding:'12px 20px',background:'none',fontSize:14,fontWeight:600,color:'var(--forest)',minHeight:48}}>+ Add new address</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  /* ════════════════════════════════════════════
      HOME
      ════════════════════════════════════════════ */
   const renderHome = () => (
     <div style={S.screen}>
       <div style={{...S.safeTop,background:'var(--sand)'}}>
         <div style={S.header}>
-          <button style={{display:'flex',alignItems:'center',gap:4,background:'none',fontSize:14,fontWeight:600,color:'var(--slate-dark)',minHeight:44}}>
-            {I.mapPin} <span style={{marginLeft:2}}>New York</span> {I.chevDown}
+          <button onClick={() => setShowLocModal(true)} style={{display:'flex',alignItems:'center',gap:5,background:'var(--grey-100)',padding:'6px 10px',borderRadius:20,fontSize:13,fontWeight:600,color:'var(--slate-dark)',minHeight:44,border:'none'}}>
+            {I.mapPin} <span>{displayCity}</span> {I.chevDown}
           </button>
           <span style={{fontFamily:'var(--font-display)',fontSize:20,color:'var(--slate-dark)',fontWeight:700}}>Handify</span>
           <button style={{background:'none',position:'relative',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -991,6 +1179,37 @@ function App() {
       </div>
       <div style={S.scroll}>
         <div style={{padding:'16px 20px 100px'}}>
+          {!contractorProfile && (
+            <button onClick={openContractorWizard} style={{
+              display:'flex',alignItems:'center',gap:14,background:'linear-gradient(135deg, rgba(45,90,61,0.06), rgba(45,90,61,0.12))',
+              border:'1.5px solid rgba(45,90,61,0.2)',borderRadius:'var(--radius)',padding:'16px',marginBottom:20,width:'100%',textAlign:'left',
+              animation:'fadeInUp 0.3s ease'
+            }}>
+              <div style={{width:44,height:44,borderRadius:'var(--radius-sm)',background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:700,fontSize:15,color:'var(--forest)',marginBottom:2}}>Start offering services</div>
+                <div style={{fontSize:13,color:'var(--text-muted)'}}>Set up your contractor profile and start earning</div>
+              </div>
+              {I.chevRight}
+            </button>
+          )}
+          {contractorProfile && (
+            <div style={{
+              display:'flex',alignItems:'center',gap:14,background:'rgba(45,90,61,0.06)',border:'1.5px solid rgba(45,90,61,0.2)',
+              borderRadius:'var(--radius)',padding:'16px',marginBottom:20,animation:'fadeInUp 0.3s ease'
+            }}>
+              <div style={{width:44,height:44,borderRadius:'var(--radius-sm)',background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                {I.shield}
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:700,fontSize:15,color:'var(--forest)',marginBottom:2}}>Contractor profile active</div>
+                <div style={{fontSize:13,color:'var(--text-muted)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{contractorProfile.title || 'Your services are visible to clients'}</div>
+              </div>
+              <button onClick={openContractorWizard} style={{background:'none',fontSize:12,fontWeight:700,color:'var(--forest)',minHeight:44,padding:'0 4px'}}>Edit</button>
+            </div>
+          )}
           <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',marginBottom:12,fontWeight:700}}>My Applications</h3>
           <div style={{display:'flex',gap:8,marginBottom:12}}>
             {[{id:'pending',label:'Pending'},{id:'accepted',label:'Accepted'},{id:'declined',label:'Declined'}].map(t => (
@@ -1035,6 +1254,7 @@ function App() {
               {icon:I.fileText,label:'My Applications'},
               {icon:I.bookmark,label:'Saved Jobs'},
               {icon:I.star(20),label:'My Reviews'},
+              {icon:I.locationPin,label:'Saved Addresses',action:() => {setShowAddressesScreen(true);setShowAddrForm(false);}},
               {icon:I.bell,label:'Notifications'},
               {icon:I.settings,label:'Account Settings'},
               {icon:I.helpCircle,label:'Help Center'},
@@ -1089,6 +1309,241 @@ function App() {
   );
 
   /* ════════════════════════════════════════════
+     ROLE SELECTION SHEET
+     ════════════════════════════════════════════ */
+  const renderRoleSheet = () => (
+    <>
+      <div style={{position:'fixed',inset:0,zIndex:290,background:'rgba(0,0,0,0.5)'}} />
+      <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:300,background:'var(--cream)',borderRadius:'16px 16px 0 0',padding:'24px 20px',paddingBottom:'max(var(--safe-bottom), 32px)',animation:'slideUp 0.35s cubic-bezier(0.32,0.72,0,1)'}}>
+        <div style={{width:36,height:4,borderRadius:2,background:'var(--grey-300)',margin:'0 auto 24px'}} />
+        <h2 style={{fontFamily:'var(--font-display)',fontSize:24,color:'var(--slate-dark)',fontWeight:700,marginBottom:6,textAlign:'center'}}>How do you want to use Handify?</h2>
+        <p style={{color:'var(--text-muted)',fontSize:14,textAlign:'center',marginBottom:24}}>You can always change this later from your profile.</p>
+        <div style={{display:'flex',flexDirection:'column',gap:12}}>
+          <button onClick={() => { localStorage.setItem('handify_role_set','client'); setShowRoleSheet(false); }} style={{
+            background:'var(--cream)',border:'2px solid var(--grey-200)',borderRadius:'var(--radius)',padding:'18px 20px',textAlign:'left',display:'flex',alignItems:'center',gap:16,minHeight:80,transition:'all 0.15s ease'
+          }}>
+            <div style={{width:48,height:48,borderRadius:'var(--radius-sm)',background:'rgba(45,90,61,0.1)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:16,color:'var(--slate-dark)',marginBottom:3}}>I need work done</div>
+              <div style={{fontSize:13,color:'var(--text-muted)'}}>Post jobs and find people to help you</div>
+            </div>
+            {I.chevRight}
+          </button>
+          <button onClick={() => { localStorage.setItem('handify_role_set','contractor'); setShowRoleSheet(false); openContractorWizard(); }} style={{
+            background:'rgba(45,90,61,0.04)',border:'2px solid var(--forest)',borderRadius:'var(--radius)',padding:'18px 20px',textAlign:'left',display:'flex',alignItems:'center',gap:16,minHeight:80,transition:'all 0.15s ease'
+          }}>
+            <div style={{width:48,height:48,borderRadius:'var(--radius-sm)',background:'rgba(45,90,61,0.1)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:16,color:'var(--forest)',marginBottom:3}}>I want to offer services</div>
+              <div style={{fontSize:13,color:'var(--text-muted)'}}>Set up your contractor profile and start earning</div>
+            </div>
+            {I.chevRight}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  /* ════════════════════════════════════════════
+     CONTRACTOR ONBOARDING WIZARD
+     ════════════════════════════════════════════ */
+  const renderContractorWizard = () => {
+    const toggleCat = (cat) => {
+      setWizardData(d => ({ ...d, categories: d.categories.includes(cat) ? d.categories.filter(c=>c!==cat) : [...d.categories, cat] }));
+    };
+    const Chip = ({label, selected, onPress}) => (
+      <button onClick={onPress} style={{
+        ...S.chip, border:`1.5px solid ${selected?'var(--forest)':'var(--grey-200)'}`,
+        background:selected?'rgba(45,90,61,0.08)':'var(--cream)',
+        color:selected?'var(--forest)':'var(--grey-500)', fontSize:12, fontWeight:600, minHeight:38
+      }}>{label}</button>
+    );
+    const Toggle = ({options, value, onChange}) => (
+      <div style={{display:'flex',background:'var(--grey-100)',borderRadius:'var(--radius-sm)',padding:3}}>
+        {options.map(opt => (
+          <button key={opt.id} onClick={() => onChange(opt.id)} style={{flex:1,padding:'10px',borderRadius:6,fontSize:13,fontWeight:600,minHeight:44,transition:'all 0.2s',
+            background:value===opt.id?'var(--cream)':'transparent',
+            color:value===opt.id?'var(--slate-dark)':'var(--grey-400)',
+            boxShadow:value===opt.id?'var(--shadow-sm)':'none'
+          }}>{opt.label}</button>
+        ))}
+      </div>
+    );
+    const closeWizard = () => { setShowContractorWizard(false); setWizardStep(1); setWizardDone(false); };
+    const publishProfile = () => {
+      const profile = { ...wizardData, published: true };
+      localStorage.setItem('handify_contractor_profile', JSON.stringify(profile));
+      setContractorProfile(profile);
+      setWizardDone(true);
+    };
+    return (
+      <div style={{...S.modal,...S.safeTop,zIndex:250}}>
+        <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,background:'var(--sand)'}}>
+          <button onClick={wizardStep > 1 && !wizardDone ? () => setWizardStep(wizardStep-1) : closeWizard} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            {wizardDone ? I.close : wizardStep > 1 ? I.back : I.close}
+          </button>
+          <h2 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',flex:1,fontWeight:700}}>Contractor Profile</h2>
+          {!wizardDone && <span style={{fontSize:12,color:'var(--grey-400)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>Step {wizardStep}/4</span>}
+        </div>
+        {!wizardDone && (
+          <div style={{height:4,background:'var(--grey-200)',margin:'0 20px',borderRadius:2,overflow:'hidden'}}>
+            <div style={{height:'100%',background:'var(--forest)',borderRadius:2,width:`${(wizardStep/4)*100}%`,transition:'width 0.5s cubic-bezier(0.4,0,0.2,1)'}}/>
+          </div>
+        )}
+        {wizardDone ? (
+          <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',animation:'scaleIn 0.4s ease'}}>
+            <div style={{textAlign:'center',padding:24}}>
+              <div style={{width:80,height:80,borderRadius:'50%',background:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <h2 style={{fontFamily:'var(--font-display)',fontSize:26,color:'var(--slate-dark)',marginBottom:8,fontWeight:700}}>Profile published!</h2>
+              <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:24}}>Clients can now find you and invite you to jobs.</p>
+              <button onClick={() => {closeWizard();setTab('home');}} style={{...S.btn,...S.btnForest,width:'100%'}}>Go to Home</button>
+            </div>
+          </div>
+        ) : (
+          <div style={S.scroll}>
+            <div style={{padding:'20px 20px 100px',animation:'fadeInUp 0.3s ease'}} key={wizardStep}>
+
+              {wizardStep === 1 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>What do you offer?</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>Select all services you can provide.</p>
+                <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:24}}>
+                  {CONTRACTOR_SERVICES.map(s => (
+                    <Chip key={s} label={s} selected={wizardData.categories.includes(s)} onPress={() => toggleCat(s)} />
+                  ))}
+                </div>
+                <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>How do you want to appear?</label>
+                <input style={S.input} placeholder="e.g. Certified electrician, 10 years experience" value={wizardData.title} onChange={e => setWizardData(d=>({...d,title:e.target.value}))} />
+              </>)}
+
+              {wizardStep === 2 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>Experience & Availability</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>Help clients understand your background.</p>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Years of experience</label>
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {['1–2','3–5','5–10','10+'].map(v => (
+                      <Chip key={v} label={v} selected={wizardData.experience===v} onPress={() => setWizardData(d=>({...d,experience:v}))} />
+                    ))}
+                  </div>
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Work type</label>
+                  <Toggle options={[{id:'solo',label:'Solo'},{id:'team',label:'With a team'}]} value={wizardData.workType} onChange={v => setWizardData(d=>({...d,workType:v}))} />
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Certification / License</label>
+                  <Toggle options={[{id:false,label:'Not certified'},{id:true,label:'Certified / Licensed'}]} value={wizardData.certified} onChange={v => setWizardData(d=>({...d,certified:v}))} />
+                  {wizardData.certified && <input style={{...S.input,marginTop:10}} placeholder="e.g. NICEIC, Gas Safe, CITB" value={wizardData.certText} onChange={e => setWizardData(d=>({...d,certText:e.target.value}))} />}
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Service area city</label>
+                  <input style={{...S.input,marginBottom:10}} placeholder="e.g. Bucharest" value={wizardData.city} onChange={e => setWizardData(d=>({...d,city:e.target.value}))} />
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {['10km','25km','50km','Full county'].map(r => (
+                      <Chip key={r} label={r} selected={wizardData.radius===r} onPress={() => setWizardData(d=>({...d,radius:r}))} />
+                    ))}
+                  </div>
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Availability</label>
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {['Weekdays','Weekends','Both','Flexible'].map(a => (
+                      <Chip key={a} label={a} selected={wizardData.availability===a} onPress={() => setWizardData(d=>({...d,availability:a}))} />
+                    ))}
+                  </div>
+                </div>
+              </>)}
+
+              {wizardStep === 3 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>Rate & Presentation</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>Tell clients how you charge and who you are.</p>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:8,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>How do you charge?</label>
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {['Per hour','Per day','Per sqm','Per project','Negotiable'].map(r => (
+                      <Chip key={r} label={r} selected={wizardData.rateType===r} onPress={() => setWizardData(d=>({...d,rateType:r}))} />
+                    ))}
+                  </div>
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Estimated rate (RON) — optional</label>
+                  <input style={S.input} placeholder="e.g. 150" type="text" value={wizardData.rate} onChange={e => setWizardData(d=>({...d,rate:e.target.value}))} />
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:6,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Short bio</label>
+                  <textarea maxLength={200} style={{...S.input,minHeight:90,resize:'none'}} placeholder="Describe your experience and approach..." value={wizardData.bio} onChange={e => setWizardData(d=>({...d,bio:e.target.value}))} />
+                  <div style={{fontSize:11,color:'var(--grey-400)',textAlign:'right',marginTop:4}}>{wizardData.bio.length} / 200</div>
+                </div>
+                <div style={{marginBottom:20}}>
+                  <label style={{fontSize:11,fontWeight:700,color:'var(--grey-500)',marginBottom:10,display:'block',textTransform:'uppercase',letterSpacing:0.5}}>Past work photos — optional</label>
+                  <div style={{display:'flex',gap:10}}>
+                    {[0,1,2].map(i => (
+                      <button key={i} style={{width:90,height:90,borderRadius:'var(--radius-sm)',border:'2px dashed var(--grey-300)',background:'var(--grey-100)',display:'flex',alignItems:'center',justifyContent:'center',flex:1}}>
+                        {I.camera}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>)}
+
+              {wizardStep === 4 && (<>
+                <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--slate-dark)',marginBottom:4,fontWeight:700}}>Profile Preview</h3>
+                <p style={{color:'var(--text-muted)',fontSize:13,marginBottom:20}}>This is how you'll appear to clients.</p>
+                <div style={{...S.card,margin:'0 0 16px',borderLeft:'4px solid var(--forest)'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
+                    <Avatar init="JR" size={52} bg='var(--forest)' />
+                    <div style={{flex:1}}>
+                      <div style={{fontWeight:800,fontSize:15,color:'var(--slate-dark)',marginBottom:2}}>Jordan Reed</div>
+                      <div style={{fontSize:13,color:'var(--text-muted)',marginBottom:4}}>{wizardData.title || 'Your professional title'}</div>
+                      <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                        {wizardData.availability && <span style={{...S.chip,background:'rgba(45,90,61,0.08)',color:'var(--forest)',fontSize:11,padding:'3px 8px'}}>{wizardData.availability}</span>}
+                        {wizardData.certified && <span style={{display:'flex',alignItems:'center',gap:3,fontSize:11,color:'var(--forest)',fontWeight:700}}>{I.shield} Certified</span>}
+                      </div>
+                    </div>
+                  </div>
+                  {wizardData.bio && <p style={{fontSize:13,color:'var(--text-muted)',lineHeight:1.5,marginBottom:12}}>{wizardData.bio}</p>}
+                  <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:12}}>
+                    {wizardData.categories.slice(0,4).map(c => (
+                      <span key={c} style={{...S.chip,background:'var(--grey-100)',color:'var(--grey-600)',fontSize:11,padding:'4px 10px'}}>{c}</span>
+                    ))}
+                    {wizardData.categories.length > 4 && <span style={{...S.chip,background:'var(--grey-100)',color:'var(--grey-400)',fontSize:11,padding:'4px 10px'}}>+{wizardData.categories.length-4} more</span>}
+                  </div>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:10,fontSize:12,color:'var(--grey-500)',paddingTop:10,borderTop:'1px solid var(--grey-200)'}}>
+                    {wizardData.experience && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.clock} {wizardData.experience} yrs</span>}
+                    {wizardData.city && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.mapPin} {wizardData.city}{wizardData.radius?` · ${wizardData.radius}`:''}</span>}
+                    {wizardData.rateType && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.dollar} {wizardData.rateType}{wizardData.rate?` · ${wizardData.rate} RON`:''}</span>}
+                    {wizardData.workType==='team' && <span style={{display:'flex',alignItems:'center',gap:3}}>{I.users} With a team</span>}
+                  </div>
+                </div>
+                <button onClick={() => setWizardStep(2)} style={{background:'none',color:'var(--forest)',fontSize:14,fontWeight:700,minHeight:44,display:'flex',alignItems:'center',gap:4,padding:'4px 0',marginBottom:4}}>
+                  ← Edit details
+                </button>
+              </>)}
+
+            </div>
+          </div>
+        )}
+        {!wizardDone && (
+          <div style={{padding:'12px 20px',paddingBottom:'max(var(--safe-bottom), 16px)',background:'var(--cream)',borderTop:'1px solid var(--grey-200)',display:'flex',gap:10}}>
+            {wizardStep > 1 && <button onClick={() => setWizardStep(wizardStep-1)} style={{...S.btn,...S.btnOutline,flex:1}}>Back</button>}
+            {wizardStep < 4 ? (
+              <button onClick={() => setWizardStep(wizardStep+1)} style={{...S.btn,...S.btnForest,flex:2}}>Continue</button>
+            ) : (
+              <button onClick={publishProfile} style={{...S.btn,...S.btnEmber,flex:1}}>Publish Profile</button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
      MAIN RENDER
      ════════════════════════════════════════════ */
   if (!loggedIn) return renderAuth();
@@ -1105,6 +1560,10 @@ function App() {
       </div>
       {!selJob && !selMyJob && !selChat && renderNav()}
       {showPost && renderPostJob()}
+      {showLocModal && renderLocationModal()}
+      {showAddressesScreen && renderAddressesScreen()}
+      {showContractorWizard && renderContractorWizard()}
+      {showRoleSheet && renderRoleSheet()}
     </div>
   );
 }

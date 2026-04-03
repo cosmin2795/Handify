@@ -31,6 +31,12 @@ kotlin {
             implementation(libs.credentials.play.services)
             implementation(libs.google.identity)
 
+            // Maps & Location
+            implementation(libs.maps.compose)
+            implementation(libs.play.services.maps)
+            implementation(libs.play.services.location)
+            implementation(libs.kotlinx.coroutines.play.services)
+
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

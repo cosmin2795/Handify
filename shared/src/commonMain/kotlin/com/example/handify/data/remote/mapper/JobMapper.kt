@@ -20,5 +20,7 @@ fun JobResponse.toDomain(): Job = Job(
     clientName = clientName,
     clientRating = clientRating,
     applicantsCount = applicantsCount,
+    lat = lat,
+    lng = lng,
     createdAt = createdAt
 )

@@ -13,6 +13,9 @@ composeMultiplatform = "1.10.0"
 credentials = "1.2.2"
 exposed = "0.55.0"
 google-identity = "1.1.1"
+maps-compose = "6.5.0"
+play-services-maps = "19.2.0"
+play-services-location = "21.3.0"
 java-jwt = "4.4.0"
 junit = "4.13.2"
 koin = "4.1.0"
@@ -101,6 +104,10 @@ java-jwt = { module = "com.auth0:java-jwt", version.ref = "java-jwt" }
 credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "google-identity" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 
 # Navigation
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }

@@ -1,10 +1,9 @@
-package com.example.handify.data.remote.response
+package com.example.handify.data.remote.request
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class JobResponse(
-    val id: String,
+data class CreateJobRequest(
     val title: String,
     val description: String,
     val category: String,
@@ -12,13 +11,8 @@ data class JobResponse(
     val budgetMin: Double,
     val budgetMax: Double,
     val duration: String,
-    val status: String,
     val isUrgent: Boolean,
-    val clientId: String,
-    val clientName: String,
-    val clientRating: Double,
-    val applicantsCount: Int,
+    val status: String,
     val lat: Double? = null,
-    val lng: Double? = null,
-    val createdAt: Long
+    val lng: Double? = null
 )

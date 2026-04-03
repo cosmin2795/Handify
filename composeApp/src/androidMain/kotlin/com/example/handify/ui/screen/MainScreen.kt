@@ -17,45 +17,91 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.handify.R
 import com.example.handify.presentation.job.JobListViewModel
+import com.example.handify.presentation.location.LocationViewModel
 import com.example.handify.ui.theme.*
 import org.koin.compose.viewmodel.koinViewModel
 
 private enum class Tab { HOME, MY_JOBS, MESSAGES, PROFILE }
 
 @Composable
-fun MainScreen(viewModel: JobListViewModel = koinViewModel()) {
+fun MainScreen(
+    onLogOut: () -> Unit,
+    jobViewModel: JobListViewModel = koinViewModel(),
+    locationViewModel: LocationViewModel = koinViewModel()
+) {
     var selectedTab by rememberSaveable { mutableStateOf(Tab.HOME) }
-    val state = viewModel.state
+    var showPostJob by rememberSaveable { mutableStateOf(false) }
+    var showAddresses by rememberSaveable { mutableStateOf(false) }
+    val state = jobViewModel.state
+    val locationState = locationViewModel.state
 
-    Scaffold(
-        containerColor = Sand,
-        bottomBar = {
-            BottomBar(selectedTab = selectedTab, onTabSelect = { selectedTab = it })
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            when (selectedTab) {
-                Tab.HOME -> HomeScreen(
-                    state = state,
-                    onJobClick = {},
-                    onCategorySelect = viewModel::selectCategory,
-                    onSortSelect = viewModel::selectSort,
-                    onRetry = viewModel::loadJobs
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = Sand,
+            bottomBar = {
+                BottomBar(
+                    selectedTab = selectedTab,
+                    onTabSelect = { selectedTab = it },
+                    onPostJob = { showPostJob = true }
                 )
-                Tab.MY_JOBS -> MyJobsScreen()
-                Tab.MESSAGES -> PlaceholderTab(label = "Messages")
-                Tab.PROFILE -> PlaceholderTab(label = "Profile")
             }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                when (selectedTab) {
+                    Tab.HOME -> HomeScreen(
+                        state = state,
+                        locationState = locationState,
+                        onJobClick = {},
+                        onCategorySelect = jobViewModel::selectCategory,
+                        onSortSelect = jobViewModel::selectSort,
+                        onRetry = jobViewModel::loadJobs,
+                        onLoadUserLocation = jobViewModel::loadUserLocation,
+                        onLocationPillClick = locationViewModel::openModal,
+                        onLocationSelect = locationViewModel::selectAddress,
+                        onLocationDismiss = locationViewModel::closeModal,
+                        onLocationRemove = locationViewModel::removeAddress,
+                        onLocationSearch = locationViewModel::updateSearch,
+                        onOpenAddForm = { locationViewModel.openAddForm() },
+                        onCloseAddForm = locationViewModel::closeAddForm,
+                        onNewAddressTextChange = locationViewModel::updateNewAddressText,
+                        onNewAddressLabelChange = locationViewModel::updateNewAddressLabel,
+                        onSaveAddress = locationViewModel::saveAddress
+                    )
+                    Tab.MY_JOBS -> MyJobsScreen()
+                    Tab.MESSAGES -> PlaceholderTab(label = "Messages")
+                    Tab.PROFILE -> ProfileScreen(
+                        onLogOut = onLogOut,
+                        onSavedAddressesClick = { showAddresses = true }
+                    )
+                }
+            }
+        }
+
+        if (showPostJob) {
+            PostJobScreen(
+                onDismiss = { showPostJob = false },
+                onViewMyJobs = {
+                    showPostJob = false
+                    selectedTab = Tab.MY_JOBS
+                }
+            )
+        }
+
+        if (showAddresses) {
+            AddressesScreen(
+                onDismiss = { showAddresses = false },
+                viewModel = locationViewModel
+            )
         }
     }
 }
 
 @Composable
-private fun BottomBar(selectedTab: Tab, onTabSelect: (Tab) -> Unit) {
+private fun BottomBar(selectedTab: Tab, onTabSelect: (Tab) -> Unit, onPostJob: () -> Unit) {
     Surface(
         color = Cream,
         shadowElevation = 8.dp,
@@ -91,7 +137,7 @@ private fun BottomBar(selectedTab: Tab, onTabSelect: (Tab) -> Unit) {
                         .size(52.dp)
                         .clip(CircleShape)
                         .background(Ember)
-                        .clickable { },
+                        .clickable { onPostJob() },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(

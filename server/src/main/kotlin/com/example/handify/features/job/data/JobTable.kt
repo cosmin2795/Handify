@@ -15,6 +15,8 @@ object JobTable : Table("jobs") {
     val status = varchar("status", 50)
     val isUrgent = bool("is_urgent")
     val clientId = varchar("client_id", 36).references(UserTable.id)
+    val lat = double("lat").nullable()
+    val lng = double("lng").nullable()
     val createdAt = long("created_at")
 
     override val primaryKey = PrimaryKey(id)
