@@ -5,20 +5,25 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.handify.R
+import com.example.handify.domain.model.Job
+import com.example.handify.domain.model.JobStatus
 import com.example.handify.domain.model.User
+import com.example.handify.presentation.job.MyJobsViewModel
 import com.example.handify.presentation.profile.ProfileViewModel
 import com.example.handify.ui.component.AvatarInitials
 import com.example.handify.ui.theme.*
@@ -28,9 +33,12 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ProfileScreen(
     onLogOut: () -> Unit,
     onSavedAddressesClick: () -> Unit = {},
-    viewModel: ProfileViewModel = koinViewModel()
+    onJobClick: (Job) -> Unit = {},
+    viewModel: ProfileViewModel = koinViewModel(),
+    myJobsViewModel: MyJobsViewModel = koinViewModel()
 ) {
     val state = viewModel.state
+    val myJobsState = myJobsViewModel.state
 
     LazyColumn(
         modifier = Modifier
@@ -39,6 +47,16 @@ fun ProfileScreen(
         contentPadding = PaddingValues(bottom = 100.dp)
     ) {
         item { ProfileHeader(user = state.user) }
+        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item {
+            MyJobsSection(
+                selectedStatus = myJobsState.selectedStatus,
+                jobs = myJobsState.filteredJobs,
+                isLoading = myJobsState.isLoading,
+                onStatusSelect = myJobsViewModel::selectStatus,
+                onJobClick = onJobClick
+            )
+        }
         item { Spacer(modifier = Modifier.height(16.dp)) }
         item {
             SettingsSection(
@@ -155,6 +173,124 @@ private fun StatDivider() {
 }
 
 @Composable
+private fun MyJobsSection(
+    selectedStatus: JobStatus,
+    jobs: List<Job>,
+    isLoading: Boolean,
+    onStatusSelect: (JobStatus) -> Unit,
+    onJobClick: (Job) -> Unit
+) {
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = "My Jobs",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = SlateDark,
+            modifier = Modifier.padding(bottom = 10.dp)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                JobStatus.ACTIVE to "Active",
+                JobStatus.DRAFT to "Drafts",
+                JobStatus.COMPLETED to "Completed"
+            ).forEach { (status, label) ->
+                val isSelected = selectedStatus == status
+                val shape = RoundedCornerShape(8.dp)
+                Box(
+                    modifier = Modifier
+                        .then(if (!isSelected) Modifier.border(1.dp, Grey200, shape) else Modifier)
+                        .clip(shape)
+                        .background(if (isSelected) SlateDark else Cream)
+                        .clickable { onStatusSelect(status) }
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = label.uppercase(),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isSelected) Color.White else Grey500,
+                        letterSpacing = 0.5.sp
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        when {
+            isLoading -> {
+                Box(modifier = Modifier.fillMaxWidth().height(80.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Forest, modifier = Modifier.size(24.dp))
+                }
+            }
+            jobs.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxWidth().height(80.dp), contentAlignment = Alignment.Center) {
+                    Text(text = "No jobs here yet.", color = TextMuted, fontSize = 14.sp)
+                }
+            }
+            else -> {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    jobs.forEach { job ->
+                        ProfileJobCard(job = job, onClick = { onJobClick(job) })
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileJobCard(job: Job, onClick: () -> Unit) {
+    val catColor = CategoryColors[job.category.name] ?: Forest
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(Cream)
+            .clickable(onClick = onClick)
+            .height(IntrinsicSize.Min)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .fillMaxHeight()
+                .background(catColor)
+        )
+        Column(modifier = Modifier.padding(12.dp).weight(1f)) {
+            Text(
+                text = job.title,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = SlateDark,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(text = job.location, fontSize = 12.sp, color = Grey500)
+        }
+        Column(
+            modifier = Modifier.padding(12.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            if (job.applicantsCount > 0) {
+                Text(
+                    text = "👥 ${job.applicantsCount}",
+                    fontSize = 12.sp,
+                    color = Grey500,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Icon(
+                painter = painterResource(R.drawable.ic_chevron_right),
+                contentDescription = null,
+                tint = Grey400,
+                modifier = Modifier.size(14.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun SettingsSection(onSavedAddressesClick: () -> Unit, onLogOut: () -> Unit) {
     Column(
         modifier = Modifier
@@ -163,8 +299,6 @@ private fun SettingsSection(onSavedAddressesClick: () -> Unit, onLogOut: () -> U
             .clip(RoundedCornerShape(12.dp))
             .background(Cream)
     ) {
-        SettingsItem(icon = R.drawable.ic_briefcase, label = "My Jobs")
-        SettingsDivider()
         SettingsItem(icon = R.drawable.ic_user, label = "My Applications")
         SettingsDivider()
         SettingsItem(icon = R.drawable.ic_bookmark, label = "Saved Jobs")

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.handify.R
 import com.example.handify.domain.model.JobCategory
+import com.example.handify.presentation.job.PostJobState
 import com.example.handify.presentation.job.PostJobViewModel
 import com.example.handify.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -50,6 +51,8 @@ import java.util.Locale
 fun PostJobScreen(
     onDismiss: () -> Unit,
     onViewMyJobs: () -> Unit,
+    workerName: String? = null,
+    onStartChat: ((PostJobState) -> Unit)? = null,
     viewModel: PostJobViewModel = koinViewModel()
 ) {
     val state = viewModel.state
@@ -70,7 +73,9 @@ fun PostJobScreen(
         if (state.isSuccess) {
             SuccessContent(
                 isDraft = state.isDraft,
-                onViewMyJobs = onViewMyJobs
+                workerName = workerName,
+                onViewMyJobs = onViewMyJobs,
+                onStartChat = if (onStartChat != null) { { onStartChat(state) } } else null
             )
         } else {
             Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.statusBars)) {
@@ -588,7 +593,13 @@ private fun WizardBottomBar(
 }
 
 @Composable
-private fun SuccessContent(isDraft: Boolean, onViewMyJobs: () -> Unit) {
+private fun SuccessContent(
+    isDraft: Boolean,
+    workerName: String? = null,
+    onViewMyJobs: () -> Unit,
+    onStartChat: (() -> Unit)? = null
+) {
+    val firstName = workerName?.trim()?.split(" ")?.firstOrNull()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -617,21 +628,35 @@ private fun SuccessContent(isDraft: Boolean, onViewMyJobs: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = if (isDraft) "You can publish it anytime from My Jobs."
-                   else "You'll get notifications when someone applies.",
+            text = when {
+                onStartChat != null && firstName != null -> "Starting a conversation with $firstName…"
+                isDraft -> "You can publish it anytime from My Jobs."
+                else -> "You'll get notifications when someone applies."
+            },
             fontSize = 14.sp,
             color = TextMuted,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 32.dp)
         )
         Spacer(modifier = Modifier.height(24.dp))
-        Button(
-            onClick = onViewMyJobs,
-            modifier = Modifier.fillMaxWidth(0.7f).height(48.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Forest)
-        ) {
-            Text("View My Jobs", fontWeight = FontWeight.SemiBold)
+        if (onStartChat != null) {
+            Button(
+                onClick = onStartChat,
+                modifier = Modifier.fillMaxWidth(0.7f).height(48.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Ember)
+            ) {
+                Text("Start Conversation", fontWeight = FontWeight.SemiBold)
+            }
+        } else {
+            Button(
+                onClick = onViewMyJobs,
+                modifier = Modifier.fillMaxWidth(0.7f).height(48.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Forest)
+            ) {
+                Text("View My Jobs", fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

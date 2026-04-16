@@ -16,24 +16,36 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.handify.R
+import com.example.handify.domain.model.Job
+import com.example.handify.domain.model.JobCategory
+import com.example.handify.domain.model.JobStatus
 import com.example.handify.presentation.job.JobListViewModel
+import com.example.handify.presentation.job.MyJobsViewModel
+import com.example.handify.presentation.job.PostJobState
 import com.example.handify.presentation.location.LocationViewModel
 import com.example.handify.ui.theme.*
 import org.koin.compose.viewmodel.koinViewModel
 
-private enum class Tab { HOME, MY_JOBS, MESSAGES, PROFILE }
+private enum class Tab { HOME, WORKERS, MESSAGES, PROFILE }
 
 @Composable
 fun MainScreen(
     onLogOut: () -> Unit,
     jobViewModel: JobListViewModel = koinViewModel(),
-    locationViewModel: LocationViewModel = koinViewModel()
+    locationViewModel: LocationViewModel = koinViewModel(),
+    myJobsViewModel: MyJobsViewModel = koinViewModel()
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(Tab.HOME) }
     var showPostJob by rememberSaveable { mutableStateOf(false) }
     var showAddresses by rememberSaveable { mutableStateOf(false) }
+    var selectedJob by remember { mutableStateOf<Job?>(null) }
+    var selectedMyJob by remember { mutableStateOf<Job?>(null) }
     val state = jobViewModel.state
     val locationState = locationViewModel.state
+    val myJobsState = myJobsViewModel.state
+
+    var contactWorkerName by remember { mutableStateOf<String?>(null) }
+    var openChatWithJob by remember { mutableStateOf<Pair<String, Job>?>(null) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -55,7 +67,7 @@ fun MainScreen(
                     Tab.HOME -> HomeScreen(
                         state = state,
                         locationState = locationState,
-                        onJobClick = {},
+                        onJobClick = { selectedJob = it },
                         onCategorySelect = jobViewModel::selectCategory,
                         onSortSelect = jobViewModel::selectSort,
                         onRetry = jobViewModel::loadJobs,
@@ -71,11 +83,17 @@ fun MainScreen(
                         onNewAddressLabelChange = locationViewModel::updateNewAddressLabel,
                         onSaveAddress = locationViewModel::saveAddress
                     )
-                    Tab.MY_JOBS -> MyJobsScreen()
-                    Tab.MESSAGES -> PlaceholderTab(label = "Messages")
+                    Tab.WORKERS -> WorkersScreen(
+                        onContact = { workerName -> contactWorkerName = workerName }
+                    )
+                    Tab.MESSAGES -> MessagesScreen(
+                        openChatWithJob = openChatWithJob,
+                        onJobClick = { selectedMyJob = it }
+                    )
                     Tab.PROFILE -> ProfileScreen(
                         onLogOut = onLogOut,
-                        onSavedAddressesClick = { showAddresses = true }
+                        onSavedAddressesClick = { showAddresses = true },
+                        onJobClick = { selectedMyJob = it }
                     )
                 }
             }
@@ -83,11 +101,23 @@ fun MainScreen(
 
         if (showPostJob) {
             PostJobScreen(
-                onDismiss = { showPostJob = false },
+                onDismiss = {
+                    showPostJob = false
+                    contactWorkerName = null
+                },
                 onViewMyJobs = {
                     showPostJob = false
-                    selectedTab = Tab.MY_JOBS
-                }
+                    selectedTab = Tab.PROFILE
+                },
+                workerName = contactWorkerName,
+                onStartChat = if (contactWorkerName != null) { postState: PostJobState ->
+                    val workerName = contactWorkerName!!
+                    val job = postState.toJob()
+                    openChatWithJob = workerName to job
+                    showPostJob = false
+                    contactWorkerName = null
+                    selectedTab = Tab.MESSAGES
+                } else null
             )
         }
 
@@ -97,7 +127,63 @@ fun MainScreen(
                 viewModel = locationViewModel
             )
         }
+
+        selectedJob?.let { job ->
+            JobDetailScreen(
+                job = job,
+                onDismiss = { selectedJob = null }
+            )
+        }
+
+        selectedMyJob?.let { job ->
+            MyJobDetailScreen(
+                job = job,
+                onDismiss = { selectedMyJob = null }
+            )
+        }
+
+        contactWorkerName?.let { workerName ->
+            if (!showPostJob) {
+                ContactWorkerSheet(
+                    workerName = workerName,
+                    jobs = myJobsState.jobs,
+                    isLoading = myJobsState.isLoading,
+                    onDismiss = { contactWorkerName = null },
+                    onStartConversation = { job ->
+                        openChatWithJob = workerName to job
+                        contactWorkerName = null
+                        selectedTab = Tab.MESSAGES
+                    },
+                    onCreateJob = {
+                        showPostJob = true
+                    }
+                )
+            }
+        }
     }
+}
+
+private fun PostJobState.toJob(): Job {
+    val budgetVal = budget.replace(Regex("[^\\d.]"), "").toDoubleOrNull() ?: 0.0
+    return Job(
+        id = System.currentTimeMillis().toString(),
+        title = title.ifBlank { "New Job" },
+        description = "",
+        category = category ?: JobCategory.TRADES,
+        location = location.ifBlank { "TBD" },
+        budgetMin = budgetVal,
+        budgetMax = budgetVal,
+        duration = duration.ifBlank { "Flexible" },
+        status = if (isDraft) JobStatus.DRAFT else JobStatus.ACTIVE,
+        isUrgent = isUrgent,
+        clientId = "",
+        clientName = "",
+        clientRating = 0.0,
+        applicantsCount = 0,
+        lat = lat,
+        lng = lng,
+        createdAt = System.currentTimeMillis()
+    )
 }
 
 @Composable
@@ -122,10 +208,10 @@ private fun BottomBar(selectedTab: Tab, onTabSelect: (Tab) -> Unit, onPostJob: (
                 modifier = Modifier.weight(1f)
             )
             NavItem(
-                icon = R.drawable.ic_briefcase,
-                label = "Jobs",
-                selected = selectedTab == Tab.MY_JOBS,
-                onClick = { onTabSelect(Tab.MY_JOBS) },
+                icon = R.drawable.ic_workers,
+                label = "Workers",
+                selected = selectedTab == Tab.WORKERS,
+                onClick = { onTabSelect(Tab.WORKERS) },
                 modifier = Modifier.weight(1f)
             )
             Box(
@@ -195,12 +281,5 @@ private fun NavItem(
             color = if (selected) Forest else Grey400,
             letterSpacing = 0.5.sp
         )
-    }
-}
-
-@Composable
-private fun PlaceholderTab(label: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = label, color = TextMuted)
     }
 }

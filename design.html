@@ -121,6 +121,24 @@ const SAVED_ADDRESSES = [
   { id:'addr_2', label:'Work', fullAddress:'456 Commerce Blvd, Austin, TX' },
 ];
 
+const WORKERS = [
+  { id:1, name:'Marcus Webb', init:'MW', title:'Certified electrician, 10 years experience', cats:['Electrical','Smart home','Lighting'], rating:4.9, reviews:38, jobs:47, loc:'Brooklyn, NY', distance:'2.3 km', rateType:'Per hour', rate:'85', available:true, workType:'solo', certified:true, certText:'IBEW Licensed', experience:'10+', radius:'25 km', availability:'Weekdays', bio:'Specializing in residential and light commercial electrical work. From panel upgrades to smart home installations, I bring precision and safety to every job. All work to NEC code with permit pulled when required.' },
+  { id:2, name:'Sophie Harlan', init:'SH', title:'Residential & office cleaning specialist', cats:['Cleaning','Post-reno','Office'], rating:4.8, reviews:62, jobs:94, loc:'Manhattan, NY', distance:'1.1 km', rateType:'Per hour', rate:'45', available:true, workType:'team', certified:false, certText:'', experience:'5–10', radius:'10 km', availability:'Both', bio:'I run a small, trusted cleaning crew for homes, offices, and post-renovation jobs. We use eco-friendly products and work around your schedule. Satisfaction guaranteed — we come back free of charge if something was missed.' },
+  { id:3, name:'Daniel Cruz', init:'DC', title:'Licensed plumber, 8 years in the trade', cats:['Plumbing','Boilers','Sanitary'], rating:4.7, reviews:29, jobs:53, loc:'Queens, NY', distance:'4.8 km', rateType:'Per hour', rate:'90', available:false, workType:'solo', certified:true, certText:'NY Licensed Master Plumber', experience:'5–10', radius:'25 km', availability:'Weekdays', bio:'From routine repairs to full bathroom plumbing, I handle all phases of residential and light commercial plumbing. Fast response for emergencies. All work guaranteed and insured.' },
+  { id:4, name:'Tanya Bloom', init:'TB', title:'Landscape designer & garden specialist', cats:['Garden','Landscaping','Irrigation'], rating:4.6, reviews:17, jobs:31, loc:'Park Slope, NY', distance:'3.2 km', rateType:'Per day', rate:'280', available:true, workType:'solo', certified:false, certText:'', experience:'3–5', radius:'10 km', availability:'Weekends', bio:'Passionate about outdoor spaces. I design, plant, and maintain gardens of all sizes — from rooftop terraces to backyard lawns. Services include seasonal cleanup, new planting schemes, and drip irrigation setup.' },
+  { id:5, name:'Omar Fayed', init:'OF', title:'Moving & logistics specialist', cats:['Moving','Transport','Packing'], rating:4.5, reviews:44, jobs:68, loc:'Bronx, NY', distance:'6.1 km', rateType:'Per day', rate:'350', available:true, workType:'team', certified:false, certText:'', experience:'5–10', radius:'50 km', availability:'Both', bio:'I lead a 2–3 person moving crew with our own van. We handle packing, furniture wrapping, loading, transport, and placement. Careful with fragile items and tight stairwells. Transparent pricing with no hidden fees.' },
+  { id:6, name:'Priya Nair', init:'PN', title:'IT & smart home installation expert', cats:['IT','Networking','Smart home'], rating:4.9, reviews:21, jobs:36, loc:'Midtown, NY', distance:'0.9 km', rateType:'Per hour', rate:'75', available:false, workType:'solo', certified:true, certText:'CompTIA A+, Cisco CCNA', experience:'5–10', radius:'10 km', availability:'Flexible', bio:'Expert in home network setup, CCTV installation, smart home automation (Google, Alexa, Matter), and IT troubleshooting. I work fast, leave no mess, and explain everything clearly.' },
+];
+
+const WORKER_REVIEWS = {
+  1:[{name:'Lisa Chen',rating:5,text:'Marcus upgraded our entire electrical panel and installed 6 smart switches. Incredibly tidy work, explained everything step by step.',date:'2 weeks ago'},{name:'Tom Ricci',rating:5,text:'Fixed a dangerous circuit issue same day. Trustworthy and professional.',date:'1 month ago'}],
+  2:[{name:'Sarah Mitchell',rating:5,text:'Sophie\'s team did a full post-reno clean in half the time I expected. Spotless result.',date:'3 days ago'},{name:'Brian Walsh',rating:4,text:'Very thorough weekly cleaning service, always punctual.',date:'1 week ago'}],
+  3:[{name:'Elena R.',rating:5,text:'Daniel replaced our water heater and fixed two leaks in one visit. Clear pricing, no surprises.',date:'1 week ago'},{name:'Mike T.',rating:4,text:'Solid plumber, showed up on time and fixed the issue fast.',date:'3 weeks ago'}],
+  4:[{name:'Joanna Park',rating:5,text:'Tanya transformed our backyard completely. Plants are thriving months later.',date:'1 month ago'},{name:'Dan Cooper',rating:4,text:'Great at spring cleanup. Will hire again for fall.',date:'2 months ago'}],
+  5:[{name:'Victor R.',rating:5,text:'Omar\'s crew moved a 3-bedroom in 4 hours. Zero damage, great price.',date:'2 weeks ago'},{name:'Ian B.',rating:4,text:'Efficient team, van was big enough for everything. Recommend.',date:'1 month ago'}],
+  6:[{name:'Frank M.',rating:5,text:'Priya set up our entire home network and Nest system in one afternoon. 10/10.',date:'5 days ago'},{name:'George T.',rating:5,text:'Brilliant with smart home tech. Patient and thorough.',date:'2 weeks ago'}],
+};
+
 const CONTRACTOR_SERVICES = [
   'Constructions & Renovations','Plastering & Rendering','Painting & Decorating','Tiling (floor & wall)','Flooring & Parquet','Drywall & Ceilings','Thermal Insulation','Waterproofing','Demolition & Debris removal',
   'Plumbing','Boilers & Heating','Sanitary fixtures',
@@ -172,6 +190,7 @@ const MESSAGES_DATA = {
    ================================================================ */
 const I = {
   home: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  workers: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
   briefcase: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>,
   chat: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>,
   user: (c) => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
@@ -280,6 +299,19 @@ function App() {
     categories: [], title: '', experience: '', workType: 'solo', certified: false, certText: '',
     city: '', radius: '', availability: '', rateType: '', rate: '', bio: '', photos: [null,null,null],
   });
+
+  const [workerSearch, setWorkerSearch] = useState('');
+  const [workerCat, setWorkerCat] = useState('All');
+  const [workerDist, setWorkerDist] = useState('Any');
+  const [workerRating, setWorkerRating] = useState('Any');
+  const [workerAvail, setWorkerAvail] = useState('Any');
+  const [workerRate, setWorkerRate] = useState('Any');
+  const [workerFiltersOpen, setWorkerFiltersOpen] = useState(false);
+  const [selWorker, setSelWorker] = useState(null);
+  const [profileJobTab, setProfileJobTab] = useState('active');
+  const [contactWorker, setContactWorker] = useState(null);
+  const [contactJobId, setContactJobId] = useState(null);
+  const [conversations, setConversations] = useState(CONVERSATIONS.map(c => ({...c, attachedJob: MY_JOBS.find(j=>j.title.toLowerCase().includes(c.jobTitle.split(' ')[0].toLowerCase())) || null})));
 
   const displayCity = addresses.find(a=>a.id===activeAddrId)?.fullAddress?.split(',')[0]?.trim() || 'Location';
 
@@ -909,7 +941,7 @@ function App() {
       const d = new Date(); d.setDate(d.getDate()+i);
       return { day:d.getDate(), wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()], full:d.toISOString().slice(0,10) };
     });
-    const closePost = () => { setShowPost(false); setPostStep(1); setPostDone(false); setPost({title:'',cat:'',urgent:false,desc:'',loc:'',date:null,duration:'',budget:'',workers:1}); };
+    const closePost = () => { setShowPost(false); setPostStep(1); setPostDone(false); setPost({title:'',cat:'',urgent:false,desc:'',loc:'',date:null,duration:'',budget:'',workers:1}); setContactWorker(null); setContactJobId(null); };
     return (
       <div style={{...S.modal,...S.safeTop}}>
         <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,background:'var(--sand)'}}>
@@ -1038,8 +1070,23 @@ function App() {
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
               <h2 style={{fontFamily:'var(--font-display)',fontSize:26,color:'var(--slate-dark)',marginBottom:8,fontWeight:700}}>Your job is live!</h2>
-              <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:24}}>You'll get notifications when someone applies.</p>
-              <button onClick={() => {closePost();setTab('jobs');}} style={{...S.btn,...S.btnForest,width:'100%'}}>View My Jobs</button>
+              <p style={{color:'var(--text-muted)',fontSize:14,marginBottom:24}}>{contactWorker ? `Starting a conversation with ${contactWorker.name.split(' ')[0]}…` : "You'll get notifications when someone applies."}</p>
+              {contactWorker ? (
+                <button onClick={() => {
+                  const now = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+                  const newJob = {...post, id: Date.now(), status:'active', applicants:0, budget: post.budget ? `$${post.budget}` : 'TBD'};
+                  const newId = Date.now() + 1;
+                  const w = contactWorker;
+                  const newConv = {id:newId, name:w.name, init:w.init, lastMsg:`Re: ${post.title||'New job'}`, time:'Now', unread:0, jobTitle:post.title||'New job', online:w.available, attachedJob:newJob};
+                  setConversations(prev => [newConv, ...prev]);
+                  setMsgs(prev => ({...prev, [newId]: [{id:1, from:'me', text:`Hi ${w.name.split(' ')[0]}! I'd like to discuss a job with you.`, time:now}]}));
+                  setShowPost(false); setPostStep(1); setPostDone(false); setPost({title:'',cat:'',urgent:false,desc:'',loc:'',date:null,duration:'',budget:'',workers:1});
+                  setContactWorker(null); setContactJobId(null); setSelWorker(null);
+                  setTab('messages'); setSelChat(newId);
+                }} style={{...S.btn,...S.btnEmber,width:'100%'}}>Start Conversation</button>
+              ) : (
+                <button onClick={() => {closePost();setTab('profile');}} style={{...S.btn,...S.btnForest,width:'100%'}}>View My Jobs</button>
+              )}
             </div>
           </div>
         )}
@@ -1065,8 +1112,11 @@ function App() {
      ════════════════════════════════════════════ */
   const renderMessages = () => {
     if (selChat) {
-      const conv = CONVERSATIONS.find(c => c.id === selChat);
+      const conv = conversations.find(c => c.id === selChat);
       const m = msgs[selChat] || [];
+      const job = conv?.attachedJob || null;
+      const catColor = job ? (CAT_COLORS[job.cat] || 'var(--forest)') : 'var(--forest)';
+      const catLabel = job ? (CATEGORIES.find(c=>c.id===job.cat)?.label || job.cat) : '';
       const sendMsg = () => {
         if (chatIn.trim()) {
           setMsgs(prev => ({...prev,[selChat]:[...(prev[selChat]||[]),{id:Date.now(),from:'me',text:chatIn,time:new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}]}));
@@ -1086,9 +1136,26 @@ function App() {
               <span style={{fontSize:11,color:'var(--grey-400)'}}>{conv.online?'Online':'Offline'}</span>
             </div>
           </div>
-          <div style={{background:'rgba(45,90,61,0.05)',padding:'8px 16px',display:'flex',alignItems:'center',gap:8,borderBottom:'1px solid var(--grey-200)'}}>
-            <span style={{display:'flex',alignItems:'center',gap:4,fontSize:12,color:'var(--forest)',fontWeight:600}}>{I.briefcase('var(--forest)')} {conv.jobTitle}</span>
-          </div>
+          {job && (
+            <div style={{margin:'12px 16px 0',background:'var(--cream)',borderRadius:'var(--radius)',border:'1px solid var(--grey-200)',boxShadow:'var(--shadow-md)',overflow:'hidden',animation:'fadeInUp 0.3s ease',flexShrink:0}}>
+              <div style={{padding:'12px 14px 10px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+                  <span style={{background:catColor,color:'white',fontSize:10,fontWeight:800,padding:'3px 9px',borderRadius:4,textTransform:'uppercase',letterSpacing:0.5}}>{catLabel}</span>
+                  <span style={{fontSize:10,color:'var(--grey-400)',fontWeight:600,padding:'3px 8px',borderRadius:4,background:'var(--grey-100)',textTransform:'uppercase',letterSpacing:0.3}}>{job.status}</span>
+                </div>
+                <div style={{fontFamily:'var(--font-display)',fontSize:15,fontWeight:700,color:'var(--slate-dark)',lineHeight:1.3,marginBottom:8}}>{job.title}</div>
+                <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+                  <span style={{display:'flex',alignItems:'center',gap:3,fontSize:12,color:'var(--grey-500)'}}>{I.mapPin} {job.loc}</span>
+                  <span style={{display:'flex',alignItems:'center',gap:3,fontSize:12,color:'var(--forest)',fontWeight:600}}>{I.dollar} {job.budget}</span>
+                  <span style={{display:'flex',alignItems:'center',gap:3,fontSize:12,color:'var(--grey-500)'}}>{I.clock} {job.duration}</span>
+                </div>
+              </div>
+              <div style={{height:1,background:'var(--grey-200)'}}/>
+              <button onClick={()=>setSelMyJob(job)} style={{width:'100%',padding:'11px 14px',background:'none',fontSize:13,fontWeight:700,color:'var(--forest)',display:'flex',alignItems:'center',justifyContent:'center',gap:6,minHeight:44}}>
+                {I.fileText} View Details
+              </button>
+            </div>
+          )}
           <div style={{...S.scroll,padding:'12px 16px',display:'flex',flexDirection:'column',gap:8}}>
             <div style={{textAlign:'center',padding:'8px 0'}}><span style={{fontSize:11,color:'var(--grey-400)',background:'var(--grey-100)',padding:'4px 12px',borderRadius:10}}>Today</span></div>
             {m.map((msg,i) => (
@@ -1124,7 +1191,7 @@ function App() {
         </div>
         <div style={S.scroll}>
           <div style={{padding:'4px 0 100px'}}>
-            {CONVERSATIONS.map((conv,i) => (
+            {conversations.map((conv,i) => (
               <button key={conv.id} onClick={() => setSelChat(conv.id)} style={{
                 display:'flex',alignItems:'center',gap:12,padding:'14px 20px',width:'100%',background:'var(--cream)',
                 borderBottom:'1px solid var(--grey-100)',textAlign:'left',animation:`fadeInUp 0.3s ease ${i*0.06}s both`,minHeight:72
@@ -1147,6 +1214,105 @@ function App() {
           </div>
         </div>
       </div>
+    );
+  };
+
+  const renderContactSheet = () => {
+    if (!contactWorker) return null;
+    const w = contactWorker;
+    const activeJobs = MY_JOBS.filter(j => j.status === 'active' || j.status === 'draft');
+    const hasJobs = activeJobs.length > 0;
+    const selectedJob = activeJobs.find(j => j.id === contactJobId);
+    const catColor = (job) => CAT_COLORS[job.cat] || 'var(--forest)';
+    const catLabel = (job) => CATEGORIES.find(c=>c.id===job.cat)?.label || job.cat;
+
+    const startConversation = () => {
+      if (!selectedJob) return;
+      const now = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      const newId = Date.now();
+      const newConv = {
+        id: newId, name: w.name, init: w.init,
+        lastMsg: `Re: ${selectedJob.title}`, time: 'Now',
+        unread: 0, jobTitle: selectedJob.title, online: w.available,
+        attachedJob: selectedJob,
+      };
+      setConversations(prev => [newConv, ...prev]);
+      setMsgs(prev => ({...prev, [newId]: [
+        {id:1, from:'me', text:`Hi ${w.name.split(' ')[0]}! I'd like to discuss a job with you.`, time: now},
+      ]}));
+      setContactWorker(null);
+      setContactJobId(null);
+      setSelWorker(null);
+      setTab('messages');
+      setSelChat(newId);
+    };
+
+    return (
+      <>
+        <div onClick={()=>{setContactWorker(null);setContactJobId(null);}} style={{...S.overlay,zIndex:300}}/>
+        <div style={{position:'fixed',bottom:0,left:0,right:0,zIndex:310,background:'var(--cream)',borderRadius:'16px 16px 0 0',paddingBottom:'max(var(--safe-bottom), 16px)',boxShadow:'0 -4px 24px rgba(0,0,0,0.12)',animation:'slideUp 0.3s cubic-bezier(0.32,0.72,0,1)',maxHeight:'80vh',display:'flex',flexDirection:'column'}}>
+          <div style={{display:'flex',justifyContent:'center',padding:'12px 0 4px'}}>
+            <div style={{width:36,height:4,borderRadius:2,background:'var(--grey-300)'}}/>
+          </div>
+          <div style={{padding:'8px 20px 14px',borderBottom:'1px solid var(--grey-200)'}}>
+            <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',fontWeight:700,marginBottom:3}}>Which job is this about?</h3>
+            <p style={{fontSize:13,color:'var(--text-muted)'}}>The worker will see your job details.</p>
+          </div>
+          <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch'}}>
+            {hasJobs ? (
+              <div style={{padding:'8px 0'}}>
+                {activeJobs.map(job => {
+                  const isSelected = contactJobId === job.id;
+                  const cc = catColor(job);
+                  return (
+                    <button key={job.id} onClick={()=>setContactJobId(isSelected ? null : job.id)} style={{
+                      display:'flex',alignItems:'center',gap:12,padding:'14px 20px',width:'100%',background:isSelected?'rgba(45,90,61,0.04)':'transparent',
+                      borderBottom:'1px solid var(--grey-100)',textAlign:'left',transition:'background 0.15s'
+                    }}>
+                      <div style={{width:4,alignSelf:'stretch',borderRadius:2,background:cc,flexShrink:0}}/>
+                      <div style={{flex:1}}>
+                        <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4}}>
+                          <span style={{fontSize:10,fontWeight:800,color:'white',background:cc,padding:'2px 8px',borderRadius:4,textTransform:'uppercase',letterSpacing:0.4}}>{catLabel(job)}</span>
+                          <span style={{fontSize:10,fontWeight:700,color:job.status==='active'?'var(--forest)':'var(--grey-400)',background:job.status==='active'?'rgba(45,90,61,0.08)':'var(--grey-100)',padding:'2px 8px',borderRadius:4,textTransform:'uppercase',letterSpacing:0.3}}>{job.status}</span>
+                        </div>
+                        <div style={{fontSize:14,fontWeight:600,color:'var(--slate-dark)',marginBottom:2}}>{job.title}</div>
+                        <div style={{display:'flex',gap:10,fontSize:12,color:'var(--grey-500)'}}><span>{job.loc}</span><span style={{color:'var(--forest)',fontWeight:600}}>{job.budget}</span></div>
+                      </div>
+                      <div style={{width:22,height:22,borderRadius:11,border:`2px solid ${isSelected?'var(--forest)':'var(--grey-300)'}`,background:isSelected?'var(--forest)':'transparent',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,transition:'all 0.15s'}}>
+                        {isSelected && <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'40px 24px',textAlign:'center'}}>
+                <div style={{width:56,height:56,borderRadius:'50%',background:'var(--grey-100)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:14}}>{I.briefcase('var(--grey-400)')}</div>
+                <p style={{fontSize:15,fontWeight:600,color:'var(--slate-dark)',marginBottom:6}}>You haven't posted any jobs yet.</p>
+                <p style={{fontSize:13,color:'var(--text-muted)'}}>Create a job first so the worker knows what you need.</p>
+              </div>
+            )}
+          </div>
+          <div style={{padding:'12px 20px',borderTop:'1px solid var(--grey-200)',display:'flex',flexDirection:'column',gap:8}}>
+            {hasJobs ? (
+              <>
+                <button onClick={startConversation} disabled={!contactJobId} style={{
+                  ...S.btn,...S.btnEmber,width:'100%',
+                  opacity:contactJobId?1:0.45,
+                  transition:'opacity 0.15s'
+                }}>Start Conversation</button>
+                <button onClick={()=>{setContactWorker(null);setContactJobId(null);setShowPost(true);setPostStep(1);setPostDone(false);}} style={{background:'none',fontSize:13,fontWeight:700,color:'var(--forest)',padding:'8px',minHeight:40}}>
+                  Create a new job instead
+                </button>
+              </>
+            ) : (
+              <button onClick={()=>{setContactWorker(null);setContactJobId(null);setShowPost(true);setPostStep(1);setPostDone(false);}} style={{...S.btn,...S.btnEmber,width:'100%'}}>
+                Create a Job First
+              </button>
+            )}
+          </div>
+        </div>
+      </>
     );
   };
 
@@ -1210,7 +1376,47 @@ function App() {
               <button onClick={openContractorWizard} style={{background:'none',fontSize:12,fontWeight:700,color:'var(--forest)',minHeight:44,padding:'0 4px'}}>Edit</button>
             </div>
           )}
-          <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',marginBottom:12,fontWeight:700}}>My Applications</h3>
+          <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',marginBottom:12,fontWeight:700}}>My Jobs</h3>
+          <div style={{display:'flex',gap:8,marginBottom:12}}>
+            {[{id:'active',label:'Active'},{id:'draft',label:'Drafts'},{id:'completed',label:'Completed'}].map(t=>(
+              <button key={t.id} onClick={()=>setProfileJobTab(t.id)} style={{
+                ...S.chip,fontSize:11,fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,
+                background:profileJobTab===t.id?'var(--slate-dark)':'var(--cream)',
+                color:profileJobTab===t.id?'white':'var(--grey-500)',
+                border:profileJobTab===t.id?'none':'1px solid var(--grey-200)'
+              }}>{t.label}</button>
+            ))}
+          </div>
+          {MY_JOBS.filter(j=>j.status===profileJobTab).map((job,i)=>(
+            <div key={job.id} onClick={()=>setSelMyJob(job)} style={{
+              ...S.card,margin:'0 0 10px',borderLeft:`4px solid ${CAT_COLORS[job.cat]||'var(--forest)'}`,
+              ...(job.status==='draft'?{borderStyle:'dashed',borderWidth:2,borderColor:'var(--grey-300)',borderLeftWidth:4,borderLeftColor:CAT_COLORS[job.cat]||'var(--forest)'}:{}),
+              animation:`fadeInUp 0.3s ease ${i*0.05}s both`,cursor:'pointer'
+            }}>
+              <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:6}}>
+                <h4 style={{fontFamily:'var(--font-display)',fontSize:15,color:'var(--slate-dark)',fontWeight:600,flex:1,marginRight:8}}>{job.title}</h4>
+                <span style={{fontSize:10,fontWeight:700,padding:'3px 8px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5,flexShrink:0,
+                  ...(job.status==='active'?{background:'rgba(45,90,61,0.1)',color:'var(--forest)'}:
+                     job.status==='draft'?{background:'var(--grey-100)',color:'var(--grey-500)',border:'1px dashed var(--grey-300)'}:
+                     {background:'rgba(44,62,80,0.08)',color:'var(--slate)'})
+                }}>{job.status==='active'?'Active':job.status==='draft'?'Draft':'Done'}</span>
+              </div>
+              <div style={{display:'flex',flexWrap:'wrap',gap:10,fontSize:12,color:'var(--grey-500)',marginBottom:8}}>
+                <span style={{display:'flex',alignItems:'center',gap:3}}>{I.mapPin} {job.loc}</span>
+                <span style={{display:'flex',alignItems:'center',gap:3}}>{I.dollar} {job.budget}</span>
+              </div>
+              {job.status==='active' && job.applicants>0 && (
+                <div style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'var(--forest)',fontWeight:700}}>
+                  {I.users} {job.applicants} applicant{job.applicants!==1?'s':''}
+                </div>
+              )}
+            </div>
+          ))}
+          {MY_JOBS.filter(j=>j.status===profileJobTab).length===0 && (
+            <p style={{fontSize:13,color:'var(--text-muted)',marginBottom:16}}>No {profileJobTab} jobs yet.</p>
+          )}
+
+          <h3 style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',marginBottom:12,marginTop:8,fontWeight:700}}>My Applications</h3>
           <div style={{display:'flex',gap:8,marginBottom:12}}>
             {[{id:'pending',label:'Pending'},{id:'accepted',label:'Accepted'},{id:'declined',label:'Declined'}].map(t => (
               <button key={t.id} onClick={() => setAppTab(t.id)} style={{
@@ -1250,7 +1456,6 @@ function App() {
 
           <div style={{marginTop:24}}>
             {[
-              {icon:I.briefcase('var(--grey-500)'),label:'My Jobs',action:() => setTab('jobs')},
               {icon:I.fileText,label:'My Applications'},
               {icon:I.bookmark,label:'Saved Jobs'},
               {icon:I.star(20),label:'My Reviews'},
@@ -1276,6 +1481,213 @@ function App() {
   );
 
   /* ════════════════════════════════════════════
+     WORKERS
+     ════════════════════════════════════════════ */
+  const WORKER_CATS = ['All','Electrical','Plumbing','Construction','Cleaning','Moving','Garden','Auto','IT','Events'];
+
+  const renderWorkerDetail = () => {
+    const w = selWorker;
+    const reviews = WORKER_REVIEWS[w.id] || [];
+    return (
+      <div style={{...S.modal,...S.safeTop}}>
+        <div style={{display:'flex',alignItems:'center',padding:'12px 20px',gap:12,borderBottom:'1px solid var(--grey-200)',background:'var(--sand)'}}>
+          <button onClick={()=>setSelWorker(null)} style={{background:'none',padding:4,minHeight:44,minWidth:44,display:'flex',alignItems:'center',justifyContent:'center'}}>{I.back}</button>
+          <h2 style={{fontFamily:'var(--font-display)',fontSize:17,color:'var(--slate-dark)',flex:1,fontWeight:600}}>{w.name}</h2>
+        </div>
+        <div style={{...S.scroll,paddingBottom:100}}>
+          <div style={{background:'linear-gradient(135deg, var(--slate-dark), var(--forest))',padding:'24px 20px 28px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:14}}>
+              <div style={{position:'relative'}}>
+                <Avatar init={w.init} size={64} bg='rgba(255,255,255,0.15)' />
+                {w.available && <div style={{position:'absolute',bottom:2,right:2,width:14,height:14,borderRadius:7,background:'#2ECC71',border:'3px solid var(--sand)'}}/>}
+              </div>
+              <div>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <h2 style={{color:'white',fontSize:18,fontWeight:800}}>{w.name}</h2>
+                  {w.certified && <span style={{fontSize:10,color:'var(--sage-light)',fontWeight:700,display:'flex',alignItems:'center',gap:2}}>{I.shield} Verified</span>}
+                </div>
+                <p style={{color:'rgba(255,255,255,0.7)',fontSize:13,marginTop:2}}>{w.title}</p>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:8,marginTop:16}}>
+              {[{n:w.rating,l:'Rating'},{n:w.reviews,l:'Reviews'},{n:w.jobs,l:'Jobs'},{n:w.experience,l:'Exp'}].map((stat,i)=>(
+                <div key={i} style={{flex:1,background:'rgba(255,255,255,0.08)',borderRadius:8,padding:'8px 4px',textAlign:'center'}}>
+                  <div style={{color:'white',fontSize:15,fontWeight:800}}>{stat.n}</div>
+                  <div style={{color:'rgba(255,255,255,0.5)',fontSize:9,fontWeight:600,textTransform:'uppercase',letterSpacing:0.3}}>{stat.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{padding:'16px 20px'}}>
+            <div style={{marginBottom:16}}>
+              <h4 style={{fontSize:11,fontWeight:800,color:'var(--slate)',marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Services</h4>
+              <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                {w.cats.map(c=>(
+                  <span key={c} style={{...S.chip,background:'var(--grey-100)',color:'var(--grey-600)',fontSize:11,padding:'4px 10px',fontWeight:600}}>{c}</span>
+                ))}
+              </div>
+            </div>
+            <div style={{...S.card,margin:'0 0 16px'}}>
+              <h4 style={{fontSize:11,fontWeight:800,color:'var(--slate)',marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>About</h4>
+              <p style={{fontSize:14,color:'var(--text-muted)',lineHeight:1.6}}>{w.bio}</p>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
+              {[
+                {label:'Rate',val:`${w.rate} RON · ${w.rateType}`},
+                {label:'Area',val:`${w.loc.split(',')[0]} · ${w.radius}`},
+                {label:'Availability',val:w.availability},
+                {label:'Works',val:w.workType==='team'?'With a team':'Solo'},
+                ...(w.certified?[{label:'Certified',val:w.certText}]:[]),
+              ].map((d,i)=>(
+                <div key={i} style={{background:'var(--cream)',borderRadius:'var(--radius-sm)',padding:'12px',border:'1px solid var(--grey-200)'}}>
+                  <div style={{fontSize:10,color:'var(--grey-400)',fontWeight:700,marginBottom:4,textTransform:'uppercase',letterSpacing:0.5}}>{d.label}</div>
+                  <div style={{fontSize:13,fontWeight:700,color:'var(--slate-dark)'}}>{d.val}</div>
+                </div>
+              ))}
+            </div>
+            <h4 style={{fontSize:11,fontWeight:800,color:'var(--slate)',marginBottom:8,textTransform:'uppercase',letterSpacing:1}}>Past work</h4>
+            <div style={{display:'flex',gap:10,marginBottom:16,overflowX:'auto',paddingBottom:4}}>
+              {[1,2,3].map(i=>(
+                <div key={i} style={{width:140,height:100,borderRadius:'var(--radius-sm)',background:'var(--grey-100)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,border:'1px solid var(--grey-200)'}}>{I.camera}</div>
+              ))}
+            </div>
+            <h4 style={{fontSize:11,fontWeight:800,color:'var(--slate)',marginBottom:10,textTransform:'uppercase',letterSpacing:1}}>Reviews ({w.reviews})</h4>
+            {reviews.map((r,i)=>(
+              <div key={i} style={{...S.card,margin:'0 0 10px',animation:`fadeInUp 0.3s ease ${i*0.05}s both`}}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <Avatar init={r.name.split(' ').map(x=>x[0]).join('')} size={32} bg='var(--sage)' />
+                    <span style={{fontWeight:700,fontSize:13}}>{r.name}</span>
+                  </div>
+                  <span style={{display:'flex',alignItems:'center',gap:2,fontSize:12,color:'#D4A030',fontWeight:700}}>{I.star(12)} {r.rating}</span>
+                </div>
+                <p style={{fontSize:13,color:'var(--text-muted)',lineHeight:1.5,marginBottom:4}}>{r.text}</p>
+                <span style={{fontSize:11,color:'var(--grey-400)'}}>{r.date}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{padding:'12px 20px',paddingBottom:'max(var(--safe-bottom), 16px)',background:'var(--cream)',borderTop:'1px solid var(--grey-200)',display:'flex',alignItems:'center',justifyContent:'space-between',boxShadow:'0 -2px 10px rgba(0,0,0,0.04)'}}>
+          <div>
+            <div style={{fontSize:11,color:'var(--grey-400)',fontWeight:600,textTransform:'uppercase',letterSpacing:0.5}}>Rate</div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--slate-dark)',fontWeight:700}}>{w.rate} RON/{w.rateType==='Per hour'?'h':'day'}</div>
+          </div>
+          <button onClick={()=>{setContactWorker(w);setContactJobId(null);}} style={{...S.btn,...S.btnEmber,gap:6,padding:'14px 28px'}}>Contact</button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderWorkers = () => {
+    if (selWorker) return renderWorkerDetail();
+    const filteredWorkers = WORKERS.filter(w => {
+      if (workerSearch && !w.name.toLowerCase().includes(workerSearch.toLowerCase()) && !w.cats.some(c=>c.toLowerCase().includes(workerSearch.toLowerCase())) && !w.title.toLowerCase().includes(workerSearch.toLowerCase())) return false;
+      if (workerCat !== 'All' && !w.cats.some(c=>c.toLowerCase().includes(workerCat.toLowerCase()))) return false;
+      if (workerRating === '4+' && w.rating < 4) return false;
+      if (workerRating === '4.5+' && w.rating < 4.5) return false;
+      if (workerAvail === 'Available now' && !w.available) return false;
+      if (workerRate !== 'Any' && w.rateType !== workerRate) return false;
+      return true;
+    });
+    return (
+      <div style={S.screen}>
+        <div style={{...S.safeTop,background:'var(--sand)'}}>
+          <div style={{padding:'16px 20px 8px'}}>
+            <h1 style={{fontFamily:'var(--font-display)',fontSize:24,color:'var(--slate-dark)',fontWeight:700}}>Workers</h1>
+          </div>
+          <div style={{padding:'0 20px 10px'}}>
+            <div style={{display:'flex',alignItems:'center',background:'var(--cream)',borderRadius:'var(--radius-sm)',padding:'12px 14px',border:'1px solid var(--grey-200)',gap:10}}>
+              {I.search}
+              <input value={workerSearch} onChange={e=>setWorkerSearch(e.target.value)} placeholder="Search by name or skill..." style={{border:'none',flex:1,fontSize:14,color:'var(--text)',background:'transparent'}} />
+            </div>
+          </div>
+          <div style={{padding:'0 0 8px',overflowX:'auto',display:'flex',gap:8,paddingLeft:20,paddingRight:20}}>
+            {WORKER_CATS.map(cat=>(
+              <button key={cat} onClick={()=>setWorkerCat(cat)} style={{
+                ...S.chip,gap:5,flexShrink:0,
+                background:workerCat===cat?'var(--forest)':'var(--cream)',
+                color:workerCat===cat?'white':'var(--text-mid)',
+                border:workerCat===cat?'none':'1px solid var(--grey-200)',
+                fontSize:13,fontWeight:600
+              }}>{cat}</button>
+            ))}
+          </div>
+          <button onClick={()=>setWorkerFiltersOpen(!workerFiltersOpen)} style={{display:'flex',alignItems:'center',gap:6,padding:'4px 20px 8px',background:'none',fontSize:12,fontWeight:700,color:'var(--grey-500)',minHeight:36}}>
+            {I.filter} Filters {workerFiltersOpen?'▲':'▼'}
+          </button>
+          {workerFiltersOpen && (
+            <div style={{padding:'0 20px 12px',display:'flex',flexDirection:'column',gap:10,animation:'slideDown 0.2s ease'}}>
+              {[
+                {label:'Distance',opts:['5km','10km','25km','Any'],val:workerDist,set:setWorkerDist},
+                {label:'Rating',opts:['4+','4.5+','Any'],val:workerRating,set:setWorkerRating},
+                {label:'Availability',opts:['Available now','Any'],val:workerAvail,set:setWorkerAvail},
+                {label:'Rate type',opts:['Per hour','Per day','Per sqm','Any'],val:workerRate,set:setWorkerRate},
+              ].map(({label,opts,val,set})=>(
+                <div key={label}>
+                  <span style={{fontSize:10,fontWeight:700,color:'var(--grey-400)',letterSpacing:0.5,textTransform:'uppercase',marginBottom:6,display:'block'}}>{label}</span>
+                  <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                    {opts.map(v=>(
+                      <button key={v} onClick={()=>set(v)} style={{...S.chip,fontSize:11,fontWeight:700,minHeight:32,padding:'5px 12px',
+                        background:val===v?'var(--slate-dark)':'transparent',
+                        color:val===v?'white':'var(--grey-500)',
+                        border:val===v?'none':'1px solid var(--grey-300)',
+                        textTransform:'uppercase',letterSpacing:0.5}}>{v}</button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={S.scroll}>
+          <div style={{padding:'4px 0 100px'}}>
+            {filteredWorkers.map((w,i)=>(
+              <div key={w.id} onClick={()=>setSelWorker(w)} style={{...S.card,animation:`fadeInUp 0.35s ease both`,animationDelay:`${i*0.05}s`,cursor:'pointer'}}>
+                <div style={{display:'flex',gap:12,marginBottom:10}}>
+                  <div style={{position:'relative',flexShrink:0}}>
+                    <Avatar init={w.init} size={48} bg='var(--forest)' />
+                    {w.available && <div style={{position:'absolute',bottom:1,right:1,width:12,height:12,borderRadius:6,background:'#2ECC71',border:'2px solid var(--cream)'}}/>}
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                      <span style={{fontWeight:800,fontSize:15,color:'var(--slate-dark)'}}>{w.name}</span>
+                      {w.certified && <span style={{display:'flex',alignItems:'center',gap:2,fontSize:10,color:'var(--forest)',fontWeight:700}}>{I.shield} Verified</span>}
+                    </div>
+                    <p style={{fontSize:12,color:'var(--text-muted)',marginTop:2,lineHeight:1.3}}>{w.title}</p>
+                    <div style={{display:'flex',flexWrap:'wrap',gap:4,marginTop:5}}>
+                      {w.cats.slice(0,3).map(c=>(
+                        <span key={c} style={{...S.chip,background:'var(--grey-100)',color:'var(--grey-600)',fontSize:10,padding:'2px 8px',fontWeight:600}}>{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div style={{display:'flex',flexWrap:'wrap',gap:10,fontSize:12,color:'var(--grey-500)',marginBottom:10}}>
+                  <span style={{display:'flex',alignItems:'center',gap:3,color:'#D4A030',fontWeight:700}}>{I.star(12)} {w.rating} <span style={{color:'var(--grey-400)',fontWeight:400}}>· {w.reviews} reviews</span></span>
+                  <span style={{display:'flex',alignItems:'center',gap:3}}>{I.mapPin} {w.loc} · {w.distance}</span>
+                </div>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+                    <span style={{fontSize:13,fontWeight:700,color:'var(--forest)'}}>{w.rate} RON/{w.rateType==='Per hour'?'h':w.rateType==='Per day'?'day':'sqm'}</span>
+                    <span style={{fontSize:11,color:'var(--grey-400)'}}>{w.jobs} jobs done</span>
+                    {w.workType==='team' && <span style={{fontSize:10,color:'var(--grey-500)',background:'var(--grey-100)',padding:'2px 7px',borderRadius:'var(--radius-xs)',fontWeight:600}}>Team</span>}
+                  </div>
+                  <span style={{fontSize:10,fontWeight:700,padding:'4px 10px',borderRadius:'var(--radius-xs)',textTransform:'uppercase',letterSpacing:0.5,
+                    background:w.available?'rgba(46,204,113,0.12)':'var(--grey-100)',
+                    color:w.available?'#1E8449':'var(--grey-400)'
+                  }}>{w.available?'Available':'Busy'}</span>
+                </div>
+              </div>
+            ))}
+            {filteredWorkers.length===0 && (
+              <div style={{textAlign:'center',padding:'60px 20px',color:'var(--text-muted)',fontSize:14}}>No workers found.</div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ════════════════════════════════════════════
      BOTTOM NAV
      ════════════════════════════════════════════ */
   const totalUnread = CONVERSATIONS.reduce((s,c) => s+c.unread, 0);
@@ -1283,7 +1695,7 @@ function App() {
     <div style={S.nav}>
       {[
         {id:'home', icon:I.home, label:'Home'},
-        {id:'jobs', icon:I.briefcase, label:'Jobs'},
+        {id:'workers', icon:I.workers, label:'Workers'},
         {id:'post', icon:null, label:'Post'},
         {id:'messages', icon:I.chat, label:'Messages', badge:totalUnread},
         {id:'profile', icon:I.user, label:'Profile'},
@@ -1295,7 +1707,7 @@ function App() {
           {I.plus}
         </button>
       ) : (
-        <button key={t.id} onClick={() => {setTab(t.id);setSelJob(null);setSelMyJob(null);setSelChat(null);}} style={{
+        <button key={t.id} onClick={() => {setTab(t.id);setSelJob(null);setSelMyJob(null);setSelChat(null);setSelWorker(null);}} style={{
           display:'flex',flexDirection:'column',alignItems:'center',gap:3,background:'none',padding:'6px 10px',minWidth:56,minHeight:48,position:'relative',justifyContent:'center'
         }}>
           <div style={{position:'relative'}}>
@@ -1554,16 +1966,17 @@ function App() {
         {selJob && renderJobDetail()}
         {selMyJob && renderMyJobDetail()}
         {!selJob && !selMyJob && tab === 'home' && renderHome()}
-        {!selJob && !selMyJob && tab === 'jobs' && renderMyJobs()}
+        {!selJob && !selMyJob && tab === 'workers' && renderWorkers()}
         {!selJob && !selMyJob && tab === 'messages' && renderMessages()}
         {!selJob && !selMyJob && tab === 'profile' && renderProfile()}
       </div>
-      {!selJob && !selMyJob && !selChat && renderNav()}
+      {!selJob && !selMyJob && !selChat && !selWorker && renderNav()}
       {showPost && renderPostJob()}
       {showLocModal && renderLocationModal()}
       {showAddressesScreen && renderAddressesScreen()}
       {showContractorWizard && renderContractorWizard()}
       {showRoleSheet && renderRoleSheet()}
+      {renderContactSheet()}
     </div>
   );
 }

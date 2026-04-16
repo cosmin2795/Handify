@@ -28,7 +28,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 @Composable
-fun MyJobsScreen(viewModel: MyJobsViewModel = koinViewModel()) {
+fun MyJobsScreen(onJobClick: (Job) -> Unit = {}, viewModel: MyJobsViewModel = koinViewModel()) {
     val state = viewModel.state
 
     Column(
@@ -81,7 +81,7 @@ fun MyJobsScreen(viewModel: MyJobsViewModel = koinViewModel()) {
                     contentPadding = PaddingValues(top = 4.dp, bottom = 100.dp)
                 ) {
                     items(state.filteredJobs, key = { it.id }) { job ->
-                        MyJobCard(job = job)
+                        MyJobCard(job = job, onClick = { onJobClick(job) })
                     }
                 }
             }
@@ -120,7 +120,7 @@ private fun StatusTabRow(selected: JobStatus, onSelect: (JobStatus) -> Unit) {
 }
 
 @Composable
-private fun MyJobCard(job: Job) {
+private fun MyJobCard(job: Job, onClick: () -> Unit = {}) {
     val catColor = CategoryColors[job.category.name] ?: Forest
     val catLabel = job.category.name.lowercase().replaceFirstChar { it.uppercase() }
     val budgetText = formatBudget(job.budgetMin, job.budgetMax)
@@ -132,6 +132,7 @@ private fun MyJobCard(job: Job) {
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(Cream)
+            .clickable(onClick = onClick)
             .height(IntrinsicSize.Min)
     ) {
         Box(
